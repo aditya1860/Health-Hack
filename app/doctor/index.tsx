@@ -1,13 +1,31 @@
-import { View, Text, Button } from 'react-native';
-import { useEmergency } from '../context/EmergencyContext';
+import { View, Text, StyleSheet } from "react-native";
+import PatientList from "./PatientList";
 
-export default function Doctor() {
-  const { setRole } = useEmergency();
-
+export default function DoctorDashboard() {
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Doctor Screen</Text>
-      <Button title="Switch to Patient" onPress={() => setRole('patient')} />
+    <View style={styles.container}>
+      <Text style={styles.header}>Doctor Dashboard</Text>
+      <Text style={styles.section}>Patient Overview</Text>
+      <PatientList />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+    padding: 16
+  },
+  header: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#2563EB",
+    marginBottom: 10
+  },
+  section: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 10
+  }
+});
