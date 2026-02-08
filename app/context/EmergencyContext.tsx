@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useEffect } from 'react';
 
-type Role = 'patient' | 'doctor';
+type Role = 'patient' | 'doctor' | null;
 
 type EmergencyContextType = {
   role: Role;
@@ -19,18 +21,38 @@ export const EmergencyProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [role, setRole] = useState<Role>('patient');
+  const [role, setRole] = useState<Role>(null);
   const [emergencyActive, setEmergencyActive] = useState(false);
+
+  useEffect(() => {
+    const loadRole = async () => {
+      const savedRole = await AsyncStorage.getItem('userRole');
+      if (savedRole === 'patient' || savedRole === 'doctor') {
+        setRole(savedRole);
+      }
+    };
+    loadRole();
+  }, [])
+  const updateRole = async (newRole: Role) => {
+  if (newRole === null) {
+    await AsyncStorage.removeItem('userRole');
+  } else {
+    await AsyncStorage.setItem('userRole', newRole);
+  }
+  setRole(newRole);
+};
+;
 
   return (
     <EmergencyContext.Provider
-      value={{
-        role,
-        setRole,
-        emergencyActive,
-        startEmergency: () => setEmergencyActive(true),
-        stopEmergency: () => setEmergencyActive(false),
-      }}
+    value={{
+      role,
+      setRole: updateRole,
+      emergencyActive,
+      startEmergency: () => setEmergencyActive(true),
+      stopEmergency: () => setEmergencyActive(false),
+    }}
+
     >
       {children}
     </EmergencyContext.Provider>

@@ -1,19 +1,5 @@
-import { useEffect } from 'react';
-import { router } from 'expo-router';
-import { useEmergency } from './context/EmergencyContext';
+import { ExpoRoot } from 'expo-router';
 
-export default function Index() {
-  const { role, emergencyActive } = useEmergency();
-
-  useEffect(() => {
-    if (emergencyActive) {
-      router.replace('/emergency' as any);
-    } else if (role === 'doctor') {
-      router.replace('/doctor' as any);
-    } else {
-      router.replace('/patient' as any);
-    }
-  }, [role, emergencyActive]);
-
-  return null;
+export default function Root() {
+  return <ExpoRoot context={require.context('.', true, /\.[jt]sx?$/)} />;
 }

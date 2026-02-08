@@ -1,21 +1,27 @@
 import { View, Text, StyleSheet, Pressable, Alert } from "react-native";
 import { useEffect, useState } from "react";
 import * as Location from "expo-location";
-import { useRouter } from "expo-router";
+import { useEmergency } from "../../context/EmergencyContext";
 
 export default function EmergencyScreen() {
-  const router = useRouter();
+  const { stopEmergency } = useEmergency();
 
   const [startedAt] = useState(Date.now());
-  const [location, setLocation] = useState<Location.LocationObject | null>(null);
+  const [location, setLocation] =
+    useState<Location.LocationObject | null>(null);
 
   useEffect(() => {
-    let subscription: Location.LocationSubscription;
+    let subscription: Location.LocationSubscription | null = null;
 
     (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
+      const { status } =
+        await Location.requestForegroundPermissionsAsync();
+
       if (status !== "granted") {
-        Alert.alert("Permission required", "Location access is mandatory");
+        Alert.alert(
+          "Permission required",
+          "Location access is mandatory during emergency"
+        );
         return;
       }
 
@@ -25,14 +31,12 @@ export default function EmergencyScreen() {
           timeInterval: 3000,
           distanceInterval: 5,
         },
-        (loc) => {
-          setLocation(loc);
-        }
+        (loc) => setLocation(loc)
       );
     })();
 
     return () => {
-      if (subscription) subscription.remove();
+      subscription?.remove();
     };
   }, []);
 
@@ -45,7 +49,7 @@ export default function EmergencyScreen() {
         {
           text: "Yes",
           style: "destructive",
-          onPress: () => router.replace("/"),
+          onPress: stopEmergency,
         },
       ]
     );
@@ -76,7 +80,7 @@ export default function EmergencyScreen() {
         </Pressable>
 
         <Pressable style={styles.cancelBtn} onPress={cancelEmergency}>
-          <Text style={styles.cancelText}>Cancel Emergency</Text>
+          <Text style={styles.cancelText}>Resolve Emergency</Text>
         </Pressable>
       </View>
     </View>
@@ -86,49 +90,60 @@ export default function EmergencyScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#B00020",
-    alignItems: "center",
-    justifyContent: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#ffdede',
     padding: 24,
   },
   title: {
     fontSize: 28,
-    fontWeight: "700",
-    color: "#fff",
-    marginBottom: 10,
+    fontWeight: 'bold',
+    color: '#d32f2f',
+    marginBottom: 16,
   },
   timer: {
-    color: "#fff",
-    marginBottom: 20,
+    fontSize: 16,
+    marginBottom: 12,
+    color: '#333',
   },
   location: {
-    color: "#fff",
-    textAlign: "center",
-    marginBottom: 30,
+    fontSize: 16,
+    marginBottom: 20,
+    color: '#333',
+    textAlign: 'center',
   },
   actions: {
-    width: "100%",
+    width: '100%',
+    marginTop: 16,
+    alignItems: 'center',
   },
   actionBtn: {
-    backgroundColor: "#fff",
-    padding: 16,
-    borderRadius: 10,
+    backgroundColor: '#1976d2',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
     marginBottom: 12,
+    width: 220,
+    alignItems: 'center',
   },
   actionText: {
-    textAlign: "center",
-    fontWeight: "600",
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
   cancelBtn: {
-    marginTop: 20,
-    padding: 16,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#fff",
+    backgroundColor: '#d32f2f',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    marginTop: 8,
+    width: 220,
+    alignItems: 'center',
   },
   cancelText: {
-    textAlign: "center",
-    color: "#fff",
-    fontWeight: "600",
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
+

@@ -13,7 +13,7 @@ export default function PatientHome() {
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() => router.push("./checkin")}
+        onPress={() => router.push("./patient/checkin")}
       >
         <Text style={styles.buttonText}>Start Check-in</Text>
       </TouchableOpacity>
