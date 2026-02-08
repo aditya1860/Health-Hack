@@ -1,12 +1,20 @@
 import { View, Text, StyleSheet } from "react-native";
+import OverviewCards from "./OverviewCards";
 import PatientList from "./PatientList";
+import EmergencyHistory from "./EmergencyHistory";
 
 export default function DoctorDashboard() {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Doctor Dashboard</Text>
-      <Text style={styles.section}>Patient Overview</Text>
+
+      <OverviewCards />
+
+      <Text style={styles.section}>Patients</Text>
       <PatientList />
+
+      <Text style={styles.section}>Recent Emergencies</Text>
+      <EmergencyHistory />
     </View>
   );
 }
@@ -18,14 +26,14 @@ const styles = StyleSheet.create({
     padding: 16
   },
   header: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: "bold",
     color: "#2563EB",
-    marginBottom: 10
+    marginBottom: 12
   },
   section: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "600",
-    marginBottom: 10
+    marginVertical: 10
   }
 });
