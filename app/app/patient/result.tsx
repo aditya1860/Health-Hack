@@ -8,11 +8,12 @@ export default function Result() {
     <View style={styles.container}>
       <Text style={styles.title}>Check-in Submitted ✅</Text>
 
-      <Text>Feeling: {params.q1}</Text>
-      <Text>Dizziness: {params.q2}</Text>
-      <Text>Heart Rate: {params.q3}</Text>
-      <Text>Sleep: {params.q4}</Text>
-      <Text>Chest Pain: {params.q5}</Text>
+      <Text>Blood Sugar: {params.sugar}</Text>
+<Text>Heart Rate: {params.heartRate}</Text>
+<Text>Blood Pressure: {params.bloodPressure}</Text>
+<Text>Oxygen: {params.oxygen}</Text>
+<Text>Feeling: {params.feeling}</Text>
+
     </View>
   );
 }
