@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 
 export default function DoctorDashboard() {
@@ -8,74 +8,178 @@ export default function DoctorDashboard() {
     <View style={styles.container}>
       <Text style={styles.title}>Doctor Dashboard</Text>
 
-      {/* Patients */}
-      <TouchableOpacity
-        style={styles.card}
+      <Pressable
         onPress={() => router.push("/doctor/patients")}
-        activeOpacity={0.7}
+        style={({ hovered }) => [
+        styles.card,
+        hovered && styles.cardHover,
+        ]}
       >
-        <Text style={styles.icon}>👨‍⚕️</Text>
-        <Text style={styles.text}>Patients</Text>
-      </TouchableOpacity>
+      {({ hovered }) => (
+      <>
+      <Text
+        style={[
+          styles.cardTitle,
+          hovered && styles.cardTitleHover
+        ]}
+      >
+        Patients
+      </Text>
 
-      {/* Appointments */}
-      <TouchableOpacity
-        style={styles.card}
-        onPress={() => router.push("/doctor/appointments")}
-        activeOpacity={0.7}
+      <Text
+        style={[
+          styles.cardSub,
+          hovered && styles.cardSubHover
+        ]}
       >
-        <Text style={styles.icon}>📅</Text>
-        <Text style={styles.text}>Appointments</Text>
-      </TouchableOpacity>
+        View and manage patients
+      </Text>
+    </>
+  )}
+</Pressable>
 
-      {/* Emergencies */}
-      <TouchableOpacity
-        style={styles.card}
-        onPress={() => router.push("/doctor/emergencies")}
-        activeOpacity={0.7}
-      >
-        <Text style={styles.icon}>🚨</Text>
-        <Text style={styles.text}>Emergencies</Text>
-      </TouchableOpacity>
 
-      {/* Analytics */}
-      <TouchableOpacity
-        style={styles.card}
-        onPress={() => router.push("/doctor/analytics")}
-        activeOpacity={0.7}
+      <Pressable
+  onPress={() => router.push("/doctor/appointments")}
+  style={({ hovered }) => [
+    styles.card,
+    hovered && styles.cardHover,
+  ]}
+>
+  {({ hovered }) => (
+    <>
+      <Text
+        style={[
+          styles.cardTitle,
+          hovered && styles.cardTitleHover,
+        ]}
       >
-        <Text style={styles.icon}>📊</Text>
-        <Text style={styles.text}>Analytics</Text>
-      </TouchableOpacity>
+        Appointments
+      </Text>
+
+      <Text
+        style={[
+          styles.cardSub,
+          hovered && styles.cardSubHover,
+        ]}
+      >
+        Upcoming consultations
+      </Text>
+    </>
+  )}
+</Pressable>
+
+
+      <Pressable
+  onPress={() => router.push("/doctor/emergencies")}
+  style={({ hovered }) => [
+    styles.card,
+    hovered && styles.dangerHover,
+  ]}
+>
+  {({ hovered }) => (
+    <>
+      <Text
+        style={[
+          styles.dangerTitle,
+          hovered && styles.dangerTitleHover,
+        ]}
+      >
+        Emergencies
+      </Text>
+
+      <Text style={styles.cardSub}>
+        Emergency history & alerts
+      </Text>
+    </>
+  )}
+</Pressable>
+<Pressable
+  onPress={() => router.push("/doctor/analytics")}
+  style={({ hovered }) => [
+    styles.card,
+    hovered && styles.cardHover,
+  ]}
+>
+  {({ hovered }) => (
+    <>
+      <Text
+        style={[
+          styles.cardTitle,
+          hovered && styles.cardTitleHover,
+        ]}
+      >
+        Analytics
+      </Text>
+
+      <Text
+        style={[
+          styles.cardSub,
+          hovered && styles.cardSubHover,
+        ]}
+      >
+        Patient risk overview
+      </Text>
+    </>
+  )}
+</Pressable>
+
     </View>
   );
 }
-
+const PRIMARY = "#2563EB";
+const PRIMARY_LIGHT = "#EEF2FF";
+const PRIMARY_TEXT_HOVER = "#1D4ED8"; 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: "#FFFFFF"
+    padding: 24,
+    backgroundColor: "#F1F5F9",
+    minHeight: "100%",
   },
   title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20
+    fontSize: 26,
+    fontWeight: "700",
+    marginBottom: 24,
   },
   card: {
-    backgroundColor: "#F3F4F6",
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-    flexDirection: "row",
-    alignItems: "center"
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1.5,
+    borderColor: PRIMARY,
+    borderRadius: 14,
+    padding: 18,
+    marginBottom: 16,
+    cursor: "pointer",
   },
-  icon: {
-    fontSize: 20,
-    marginRight: 12
+  cardHover: {
+    backgroundColor: PRIMARY_LIGHT,
   },
-  text: {
-    fontSize: 16,
-    fontWeight: "500"
-  }
+  dangerHover: {
+    backgroundColor: "#FEF2F2",
+    borderColor: "#DC2626",
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: PRIMARY,
+  },cardTitleHover: {
+    color: PRIMARY_TEXT_HOVER,
+  },
+
+  cardSub: {
+    marginTop: 6,
+    color: "#475569",
+  },
+
+  cardSubHover: {
+    color: "#1E40AF",
+  },
+  dangerTitle: {
+  fontSize: 18,
+  fontWeight: "600",
+  color: "#DC2626",
+},
+dangerTitleHover: {
+  color: "#991B1B",
+},
 });
+
