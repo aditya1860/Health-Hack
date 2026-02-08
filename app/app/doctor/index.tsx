@@ -1,39 +1,185 @@
-import { View, Text, StyleSheet } from "react-native";
-import OverviewCards from "./OverviewCards";
-import PatientList from "./PatientList";
-import EmergencyHistory from "./EmergencyHistory";
+import { View, Text, StyleSheet, Pressable } from "react-native";
+import { useRouter } from "expo-router";
 
 export default function DoctorDashboard() {
+  const router = useRouter();
+
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Doctor Dashboard</Text>
+      <Text style={styles.title}>Doctor Dashboard</Text>
 
-      <OverviewCards />
+      <Pressable
+        onPress={() => router.push("/doctor/patients")}
+        style={({ hovered }) => [
+        styles.card,
+        hovered && styles.cardHover,
+        ]}
+      >
+      {({ hovered }) => (
+      <>
+      <Text
+        style={[
+          styles.cardTitle,
+          hovered && styles.cardTitleHover
+        ]}
+      >
+        Patients
+      </Text>
 
-      <Text style={styles.section}>Patients</Text>
-      <PatientList />
+      <Text
+        style={[
+          styles.cardSub,
+          hovered && styles.cardSubHover
+        ]}
+      >
+        View and manage patients
+      </Text>
+    </>
+  )}
+</Pressable>
 
-      <Text style={styles.section}>Recent Emergencies</Text>
-      <EmergencyHistory />
+
+      <Pressable
+  onPress={() => router.push("/doctor/appointments")}
+  style={({ hovered }) => [
+    styles.card,
+    hovered && styles.cardHover,
+  ]}
+>
+  {({ hovered }) => (
+    <>
+      <Text
+        style={[
+          styles.cardTitle,
+          hovered && styles.cardTitleHover,
+        ]}
+      >
+        Appointments
+      </Text>
+
+      <Text
+        style={[
+          styles.cardSub,
+          hovered && styles.cardSubHover,
+        ]}
+      >
+        Upcoming consultations
+      </Text>
+    </>
+  )}
+</Pressable>
+
+
+      <Pressable
+  onPress={() => router.push("/doctor/emergencies")}
+  style={({ hovered }) => [
+    styles.card,
+    hovered && styles.dangerHover,
+  ]}
+>
+  {({ hovered }) => (
+    <>
+      <Text
+        style={[
+          styles.dangerTitle,
+          hovered && styles.dangerTitleHover,
+        ]}
+      >
+        Emergencies
+      </Text>
+
+      <Text style={styles.cardSub}>
+        Emergency history & alerts
+      </Text>
+    </>
+  )}
+</Pressable>
+<Pressable
+  onPress={() => router.push("/doctor/analytics")}
+  style={({ hovered }) => [
+    styles.card,
+    hovered && styles.cardHover,
+  ]}
+>
+  {({ hovered }) => (
+    <>
+      <Text
+        style={[
+          styles.cardTitle,
+          hovered && styles.cardTitleHover,
+        ]}
+      >
+        Analytics
+      </Text>
+
+      <Text
+        style={[
+          styles.cardSub,
+          hovered && styles.cardSubHover,
+        ]}
+      >
+        Patient risk overview
+      </Text>
+    </>
+  )}
+</Pressable>
+
     </View>
   );
 }
-
+const PRIMARY = "#2563EB";
+const PRIMARY_LIGHT = "#EEF2FF";
+const PRIMARY_TEXT_HOVER = "#1D4ED8"; 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    padding: 24,
+    backgroundColor: "#F1F5F9",
+    minHeight: "100%",
+  },
+  title: {
+    fontSize: 26,
+    fontWeight: "700",
+    marginBottom: 24,
+  },
+  card: {
     backgroundColor: "#FFFFFF",
-    padding: 16
+    borderWidth: 1.5,
+    borderColor: PRIMARY,
+    borderRadius: 14,
+    padding: 18,
+    marginBottom: 16,
+    cursor: "pointer",
   },
-  header: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#2563EB",
-    marginBottom: 12
+  cardHover: {
+    backgroundColor: PRIMARY_LIGHT,
   },
-  section: {
+  dangerHover: {
+    backgroundColor: "#FEF2F2",
+    borderColor: "#DC2626",
+  },
+  cardTitle: {
     fontSize: 18,
     fontWeight: "600",
-    marginVertical: 10
-  }
+    color: PRIMARY,
+  },cardTitleHover: {
+    color: PRIMARY_TEXT_HOVER,
+  },
+
+  cardSub: {
+    marginTop: 6,
+    color: "#475569",
+  },
+
+  cardSubHover: {
+    color: "#1E40AF",
+  },
+  dangerTitle: {
+  fontSize: 18,
+  fontWeight: "600",
+  color: "#DC2626",
+},
+dangerTitleHover: {
+  color: "#991B1B",
+},
 });
+

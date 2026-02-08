@@ -1,11 +1,10 @@
 import { View, Text, StyleSheet } from "react-native";
-import PatientList from "./PatientList";
 
-export default function PatientsScreen() {
+export default function EmergenciesScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Patients</Text>
-      <PatientList />
+      <Text style={styles.title}>Emergencies</Text>
+      <Text>Emergency list (mock)</Text>
     </View>
   );
 }
@@ -14,7 +13,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: "#fff"
+    backgroundColor: "#FFFFFF"
   },
   title: {
     fontSize: 22,
