@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,37 +10,40 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { findUserByPhone, setSession } from '../../utils/storage';
+import { useEmergency } from '../context/EmergencyContext';
 
 const OTP = '1234';
 
 export default function PatientLogin() {
+  const { role } = useEmergency();
+
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [step, setStep] = useState<1 | 2>(1);
 
-  // ✅ SEND OTP (POPUP WORKS ON WEB + MOBILE)
+  // 🔒 Guard: only patients allowed here
+  useEffect(() => {
+    if (role !== 'patient') {
+      router.replace('/role-select');
+    }
+  }, [role]);
+
   const sendOtp = () => {
     if (phone.length !== 10) {
-      if (Platform.OS === 'web') {
-        window.alert('Enter valid mobile number');
-      } else {
-        Alert.alert('Enter valid mobile number');
-      }
+      Platform.OS === 'web'
+        ? window.alert('Enter valid mobile number')
+        : Alert.alert('Enter valid mobile number');
       return;
     }
 
     const message = 'Your OTP is 1234 (demo purpose)';
-
-    if (Platform.OS === 'web') {
-      window.alert(message);
-    } else {
-      Alert.alert('OTP Sent', message);
-    }
+    Platform.OS === 'web'
+      ? window.alert(message)
+      : Alert.alert('OTP Sent', message);
 
     setStep(2);
   };
 
-  // ✅ VERIFY OTP
   const verifyOtp = async () => {
     if (otp !== OTP) {
       Alert.alert('Invalid OTP');
@@ -104,6 +107,7 @@ export default function PatientLogin() {
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

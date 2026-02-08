@@ -1,6 +1,6 @@
 import { View, Text } from "react-native";
 import { router, useRootNavigationState } from "expo-router";
-import { useEmergency } from "../context/EmergencyContext";
+import { useEmergency } from "./context/EmergencyContext";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -27,7 +27,7 @@ export default function Index() {
   useEffect(() => {
     if (!navState?.key) return;
     if (onboardingLoading || emergencyLoading) return;
-
+    
     if (!role) {
       router.replace("/role-select");
     } else if (role === "doctor") {

@@ -53,7 +53,7 @@ export default function EmergencyGreeting({ onSelectType }: EmergencyGreetingPro
   const [timeElapsed, setTimeElapsed] = useState(0);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
     if (selectedEmergency) {
       interval = setInterval(() => {
         setTimeElapsed((prev) => prev + 1);
