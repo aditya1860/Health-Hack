@@ -36,9 +36,9 @@ export default function RoleSelect() {
       </Pressable>
 
       <Pressable
-        onPress={() => {
-          setRole('doctor');
-          router.replace('/doctor' as Href);
+          onPress={async () => {
+          await setRole('doctor');
+          router.replace('/doctor');
         }}
         style={{
           padding: 16,

@@ -1,58 +1,56 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useEffect } from 'react';
 
 type Role = 'patient' | 'doctor' | null;
 
 type EmergencyContextType = {
   role: Role;
-  setRole: (role: Role) => void;
+  setRole: (role: Role) => Promise<void>;
   emergencyActive: boolean;
   startEmergency: () => void;
   stopEmergency: () => void;
+  loading: boolean;
 };
 
 const EmergencyContext = createContext<EmergencyContextType | undefined>(
   undefined
 );
 
-export const EmergencyProvider = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
-  const [role, setRole] = useState<Role>(null);
+export const EmergencyProvider = ({ children }: { children: React.ReactNode }) => {
+  const [role, setRoleState] = useState<Role>(null);
   const [emergencyActive, setEmergencyActive] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadRole = async () => {
       const savedRole = await AsyncStorage.getItem('userRole');
       if (savedRole === 'patient' || savedRole === 'doctor') {
-        setRole(savedRole);
+        setRoleState(savedRole);
       }
+      setLoading(false);
     };
     loadRole();
-  }, [])
-  const updateRole = async (newRole: Role) => {
-  if (newRole === null) {
-    await AsyncStorage.removeItem('userRole');
-  } else {
-    await AsyncStorage.setItem('userRole', newRole);
-  }
-  setRole(newRole);
-};
-;
+  }, []);
+
+  const setRole = async (newRole: Role) => {
+    if (newRole) {
+      await AsyncStorage.setItem('userRole', newRole);
+    } else {
+      await AsyncStorage.removeItem('userRole');
+    }
+    setRoleState(newRole);
+  };
 
   return (
     <EmergencyContext.Provider
-    value={{
-      role,
-      setRole: updateRole,
-      emergencyActive,
-      startEmergency: () => setEmergencyActive(true),
-      stopEmergency: () => setEmergencyActive(false),
-    }}
-
+      value={{
+        role,
+        setRole,
+        emergencyActive,
+        startEmergency: () => setEmergencyActive(true),
+        stopEmergency: () => setEmergencyActive(false),
+        loading,
+      }}
     >
       {children}
     </EmergencyContext.Provider>
