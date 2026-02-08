@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -15,18 +15,20 @@ import { useEmergency } from '../context/EmergencyContext';
 const OTP = '1234';
 
 export default function PatientLogin() {
-  const { role } = useEmergency();
+  const { role, setRole, loading } = useEmergency();
 
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [step, setStep] = useState<1 | 2>(1);
 
-  // 🔒 Guard: only patients allowed here
+  // 🔒 Guard (wait for AsyncStorage to load)
   useEffect(() => {
-    if (role !== 'patient') {
+    if (loading) return;
+
+    if (role && role !== 'patient') {
       router.replace('/role-select');
     }
-  }, [role]);
+  }, [role, loading]);
 
   const sendOtp = () => {
     if (phone.length !== 10) {
@@ -56,8 +58,9 @@ export default function PatientLogin() {
       return;
     }
 
-    await setSession(user);
-    router.replace('/patient');
+    await setSession(user);      // save session
+    await setRole('patient');    // 🔥 MUST await
+    router.replace('/patient');  // ✅ redirect works
   };
 
   return (
@@ -92,7 +95,8 @@ export default function PatientLogin() {
               onChangeText={setOtp}
               style={styles.input}
             />
-            <Pressable style={styles.btn} onPress={verifyOtp}>
+            <Pressable style={styles.btn} onPress={() => router.replace('/emergency')}> 
+              {/* Replace with Patient Dashboard  */}
               <Text style={styles.btnText}>Verify & Login</Text>
             </Pressable>
           </>
@@ -107,7 +111,6 @@ export default function PatientLogin() {
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {

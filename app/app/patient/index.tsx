@@ -10,16 +10,20 @@ import { useEffect, useState } from "react";
 import { router, Href, useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getSession, logout } from "../../utils/storage";
+import { useEmergency } from "../context/EmergencyContext";
 
 export default function PatientDashboard() {
   const routerLocal = useRouter();
+  const { role, loading: roleLoading, setRole } = useEmergency();
   const [loading, setLoading] = useState(true);
 
 useEffect(() => {
   let isMounted = true;
 
   const init = async () => {
-    const user = await getSession();
+     if (roleLoading) return;
+
+     const user = await getSession();
 
     if (!isMounted) return;
 
@@ -41,8 +45,18 @@ useEffect(() => {
 
   const handleLogout = async () => {
     await logout();
+    await setRole(null);
     router.replace("/role-select");
   };
+  
+    if (loading || roleLoading) {
+    return (
+      <View style={styles.center}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+  
 
   if (loading) return null;
 
@@ -139,6 +153,28 @@ useEffect(() => {
         </Text>
       </View>
 
+      <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>Patient Dashboard</Text>
+
+      <TouchableOpacity style={styles.card}>
+        <Text style={styles.cardTitle}>Emergency Request</Text>
+        <Text style={styles.cardText}>
+          Request immediate medical assistance
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.card}>
+        <Text style={styles.cardTitle}>Medical History</Text>
+        <Text style={styles.cardText}>
+          View your previous medical records
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
+        <Text style={styles.logoutText}>Logout</Text>
+      </TouchableOpacity>
+    </ScrollView>
+
       {/* Emergency */}
       <Text style={styles.sectionTitle}>Emergency Access</Text>
 
@@ -167,6 +203,44 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 20,
+  },
+
+    center: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "700",
+    marginBottom: 20,
+  },
+  card: {
+    backgroundColor: "#fff",
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 16,
+    elevation: 4,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+  },
+  cardText: {
+    fontSize: 14,
+    color: "#6b7280",
+    marginTop: 4,
+  },
+  logoutBtn: {
+    marginTop: 30,
+    backgroundColor: "#dc2626",
+    padding: 14,
+    borderRadius: 12,
+  },
+  logoutText: {
+    color: "#fff",
+    textAlign: "center",
+    fontWeight: "600",
   },
 
   header: {
@@ -300,4 +374,5 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontWeight: "bold",
   },
+
 });
