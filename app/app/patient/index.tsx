@@ -12,6 +12,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getSession, logout } from "../../utils/storage";
 
 export default function PatientDashboard() {
+<<<<<<< HEAD
   const routerLocal = useRouter();
   const [loading, setLoading] = useState(true);
 
@@ -38,6 +39,17 @@ useEffect(() => {
   };
 }, []);
 
+=======
+  useEffect(() => {
+    const check = async () => {
+      const user = await getSession();
+      if (!user || user.role !== 'patient') {
+        router.replace('/patient');
+      }
+    };
+    check();
+  }, []);
+>>>>>>> 040b8e770af15b1c5ea24e8d1cc645558a9319db
 
   const handleLogout = async () => {
     await logout();

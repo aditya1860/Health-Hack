@@ -7,6 +7,7 @@ export default function DoctorDashboard() {
   const router = useRouter();
 
   // 🔐 OUR PART: protect route
+<<<<<<< HEAD
 useEffect(() => {
   let isMounted = true;
 
@@ -27,6 +28,18 @@ useEffect(() => {
   };
 }, []);
 
+=======
+  useEffect(() => {
+    const checkAuth = async () => {
+      const user = await getSession();
+      if (!user || user.role !== "doctor") {
+        router.replace('/doctor');
+
+      }
+    };
+    checkAuth();
+  }, []);
+>>>>>>> 040b8e770af15b1c5ea24e8d1cc645558a9319db
 
   // 🔐 OUR PART: logout
   const handleLogout = async () => {
