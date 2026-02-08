@@ -4,13 +4,12 @@ import { router } from 'expo-router';
 export default function RoleSelect() {
   return (
     <View style={styles.container}>
-      {/* 🔹 Sketch background stickers */}
-      <Text style={[styles.sketch, styles.sketchTopLeft]}>🩺</Text>
-      <Text style={[styles.sketch, styles.sketchTopRight]}>💉</Text>
-      <Text style={[styles.sketch, styles.sketchBottomLeft]}>🌡️</Text>
-      <Text style={[styles.sketch, styles.sketchBottomRight]}>🩹</Text>
+      {/* background sketches */}
+      <Text style={[styles.sketch, styles.topLeft]}>🩺</Text>
+      <Text style={[styles.sketch, styles.topRight]}>💉</Text>
+      <Text style={[styles.sketch, styles.bottomLeft]}>🌡️</Text>
+      <Text style={[styles.sketch, styles.bottomRight]}>🩹</Text>
 
-      {/* 🔹 Main content */}
       <View style={styles.card}>
         <Text style={styles.title}>Welcome</Text>
         <Text style={styles.subtitle}>Select your role</Text>
@@ -40,69 +39,46 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-
-  /* 🔹 Background sketch emojis */
   sketch: {
     position: 'absolute',
     fontSize: 120,
     opacity: 0.07,
   },
-  sketchTopLeft: {
-    top: 40,
-    left: 20,
-  },
-  sketchTopRight: {
-    top: 60,
-    right: 20,
-  },
-  sketchBottomLeft: {
-    bottom: 80,
-    left: 30,
-  },
-  sketchBottomRight: {
-    bottom: 60,
-    right: 30,
-  },
+  topLeft: { top: 40, left: 20 },
+  topRight: { top: 60, right: 20 },
+  bottomLeft: { bottom: 80, left: 30 },
+  bottomRight: { bottom: 60, right: 30 },
 
-  /* 🔹 Card */
   card: {
     width: '85%',
     maxWidth: 360,
-    backgroundColor: '#ffffff',
     padding: 28,
     borderRadius: 18,
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 20,
+    backgroundColor: '#fff',
     elevation: 6,
   },
-
   title: {
     fontSize: 26,
     fontWeight: '700',
-    color: '#111827',
     textAlign: 'center',
     marginBottom: 6,
   },
-
   subtitle: {
     fontSize: 14,
     color: '#6b7280',
     textAlign: 'center',
     marginBottom: 28,
   },
-
   btn: {
-    backgroundColor: '#dc2626', // medical red
+    backgroundColor: '#dc2626',
     paddingVertical: 14,
     borderRadius: 12,
     marginBottom: 14,
   },
-
   btnText: {
-    color: '#ffffff',
+    color: '#fff',
     textAlign: 'center',
-    fontSize: 16,
     fontWeight: '600',
+    fontSize: 16,
   },
 });

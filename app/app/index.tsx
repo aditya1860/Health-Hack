@@ -1,56 +1,27 @@
-// import { View, Text } from 'react-native';
-// import { useEffect } from 'react';
-// import { router, type Href } from 'expo-router';
-// import { useEmergency } from '../context/EmergencyContext';
-
-// export default function Index() {
-//   const { role, emergencyActive } = useEmergency();
-
-//   useEffect(() => {
-//     if (emergencyActive) {
-//       router.replace('/emergency' as Href);
-//     } else if (!role) {
-//       router.replace('/(auth)/role-select' as Href);
-//     } else if (role === 'doctor') {
-//       router.replace('/doctor' as Href);
-//     } else {
-//       router.replace('/patient' as Href);
-//     }
-//   }, [role, emergencyActive]);
-
-//   // 👇 IMPORTANT: fallback UI
-//   return (
-//     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-//       <Text>Loading CAREFAST...</Text>
-//     </View>
-//   );
-// }
-
 import { View, Text } from 'react-native';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { router, useRootNavigationState } from 'expo-router';
+import { useEmergency } from '../context/EmergencyContext';
 
 export default function Index() {
-  const rootNavigationState = useRootNavigationState();
-  const [ready, setReady] = useState(false);
+  const navState = useRootNavigationState();
+  const { role, loading } = useEmergency();
 
   useEffect(() => {
-    if (rootNavigationState?.key) {
-      setReady(true);
+    if (!navState?.key || loading) return;
+
+    if (!role) {
+      router.replace('/role-select');
+    } else if (role === 'doctor') {
+      router.replace('/doctor');
+    } else {
+      router.replace('/patient');
     }
-  }, [rootNavigationState]);
-
-  useEffect(() => {
-    if (!ready) return;
-
-    // AUTH-FIRST (we'll add EmergencyContext later)
-    router.replace('/role-select');
-  }, [ready]);
+  }, [navState, loading, role]);
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Booting CAREFAST…</Text>
+      <Text>Loading CAREFAST…</Text>
     </View>
   );
 }
-

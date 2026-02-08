@@ -28,8 +28,10 @@ const styles = StyleSheet.create({
   card: {
     borderWidth: 2,
     borderColor: "#DC2626",
+    borderRadius: 10,
     padding: 12,
-    marginBottom: 10
+    marginBottom: 10,
+    backgroundColor: "#FEF2F2"
   },
   patient: {
     color: "#DC2626",
