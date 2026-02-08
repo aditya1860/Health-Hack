@@ -1,4 +1,11 @@
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
 import { useState } from "react";
 import { useRouter } from "expo-router";
 
@@ -6,59 +13,85 @@ export default function CheckIn() {
   const router = useRouter();
 
   const [answers, setAnswers] = useState({
-    q1: "",
-    q2: "",
-    q3: "",
-    q4: "",
-    q5: "",
+    sugar: "",
+    heartRate: "",
+    bloodPressure: "",
+    oxygen: "",
+    feeling: "",
   });
 
   const handleSubmit = () => {
-   router.push({
-  pathname: "./result",
-  params: answers,
-});
-
+    router.push({
+      pathname: "./result",
+      params: answers,
+    });
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Daily Check-in</Text>
+    <ScrollView style={styles.container}>
+      <Text style={styles.title}>Daily Health Check-in</Text>
+      <Text style={styles.subtitle}>
+        Please enter today’s health readings
+      </Text>
 
+      {/* Blood Sugar */}
+      <Text style={styles.label}>Blood Sugar (mg/dL)</Text>
       <TextInput
         style={styles.input}
-        placeholder="1. How are you feeling today?"
-        onChangeText={(text) => setAnswers({ ...answers, q1: text })}
+        keyboardType="numeric"
+        placeholder="e.g. 110"
+        onChangeText={(text) =>
+          setAnswers({ ...answers, sugar: text })
+        }
       />
 
+      {/* Heart Rate */}
+      <Text style={styles.label}>Heart Rate (BPM)</Text>
       <TextInput
         style={styles.input}
-        placeholder="2. Any dizziness?"
-        onChangeText={(text) => setAnswers({ ...answers, q2: text })}
+        keyboardType="numeric"
+        placeholder="e.g. 72"
+        onChangeText={(text) =>
+          setAnswers({ ...answers, heartRate: text })
+        }
       />
 
+      {/* Blood Pressure */}
+      <Text style={styles.label}>Blood Pressure</Text>
       <TextInput
         style={styles.input}
-        placeholder="3. Heart rate normal?"
-        onChangeText={(text) => setAnswers({ ...answers, q3: text })}
+        placeholder="e.g. 120/80"
+        onChangeText={(text) =>
+          setAnswers({ ...answers, bloodPressure: text })
+        }
       />
 
+      {/* Oxygen */}
+      <Text style={styles.label}>Oxygen Level (SpO₂ %)</Text>
       <TextInput
         style={styles.input}
-        placeholder="4. Did you sleep well?"
-        onChangeText={(text) => setAnswers({ ...answers, q4: text })}
+        keyboardType="numeric"
+        placeholder="e.g. 98"
+        onChangeText={(text) =>
+          setAnswers({ ...answers, oxygen: text })
+        }
       />
 
+      {/* Feeling */}
+      <Text style={styles.label}>How are you feeling?</Text>
       <TextInput
-        style={styles.input}
-        placeholder="5. Any chest pain?"
-        onChangeText={(text) => setAnswers({ ...answers, q5: text })}
+        style={[styles.input, { height: 80 }]}
+        multiline
+        placeholder="Describe symptoms if any..."
+        onChangeText={(text) =>
+          setAnswers({ ...answers, feeling: text })
+        }
       />
 
       <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Submit</Text>
+        <Text style={styles.buttonText}>Submit Check-in</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -69,26 +102,39 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title: {
-    fontSize: 22,
+    fontSize: 26,
     fontWeight: "bold",
+    marginBottom: 6,
+  },
+  subtitle: {
+    fontSize: 16,
     marginBottom: 20,
+    color: "#6B7280",
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 6,
   },
   input: {
     borderWidth: 1,
     borderColor: "#D1D5DB",
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 12,
+    padding: 14,
+    borderRadius: 10,
+    marginBottom: 16,
+    fontSize: 16,
   },
   button: {
     backgroundColor: "#2563EB",
-    padding: 15,
-    borderRadius: 10,
+    padding: 16,
+    borderRadius: 12,
     marginTop: 10,
   },
   buttonText: {
-    color: "#fff",
+    color: "#FFFFFF",
     textAlign: "center",
     fontWeight: "bold",
+    fontSize: 16,
   },
 });
+   
