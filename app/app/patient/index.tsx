@@ -10,7 +10,7 @@ export default function PatientDashboard() {
     const check = async () => {
       const user = await getSession();
       if (!user || user.role !== 'patient') {
-        router.replace('/patient-login' as Href);
+        router.replace('/patient');
       }
     };
     check();

@@ -11,7 +11,8 @@ export default function DoctorDashboard() {
     const checkAuth = async () => {
       const user = await getSession();
       if (!user || user.role !== "doctor") {
-        router.replace("/doctor-login");
+        router.replace('/doctor');
+
       }
     };
     checkAuth();

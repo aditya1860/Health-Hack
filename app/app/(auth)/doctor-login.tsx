@@ -54,7 +54,7 @@ export default function DoctorLogin() {
     }
 
     await setSession(user);
-    router.replace('/doctor');
+    router.replace('/doctor')
   };
 
   return (

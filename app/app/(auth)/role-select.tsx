@@ -4,29 +4,62 @@ import { router } from "expo-router";
 export default function RoleSelect() {
   return (
     <View style={styles.container}>
-      <Text style={[styles.sketch, styles.topLeft]}>🩺</Text>
-      <Text style={[styles.sketch, styles.topRight]}>💉</Text>
-      <Text style={[styles.sketch, styles.bottomLeft]}>🌡️</Text>
-      <Text style={[styles.sketch, styles.bottomRight]}>🩹</Text>
+      {/* Background visuals */}
+      <View style={styles.bgCircleOne} />
+      <View style={styles.bgCircleTwo} />
 
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.brand}>CareFast</Text>
+
+        {/* ECG underline */}
+        <View style={styles.ecgLine}>
+          <View style={styles.dot} />
+          <View style={styles.line} />
+          <View style={styles.dot} />
+        </View>
+
+        <Text style={styles.tagline}>
+          Smart • Secure • Digital Healthcare
+        </Text>
+      </View>
+
+      {/* Main Card */}
       <View style={styles.card}>
-        <Text style={styles.title}>Welcome</Text>
-        <Text style={styles.subtitle}>Select your role</Text>
+        <Text style={styles.title}>Choose your role</Text>
+        <Text style={styles.desc}>
+          Continue to access healthcare services tailored for you
+        </Text>
 
+        {/* Patient */}
         <Pressable
-          style={styles.btn}
-          onPress={() => router.replace("./patient-login")}
+          style={({ pressed }) => [
+            styles.patientBtn,
+            pressed && styles.pressed,
+          ]}
+          onPress={() => router.replace("/patient-login")}
         >
-          <Text style={styles.btnText}>Continue as Patient</Text>
+          <Text style={styles.patientText}>Continue as Patient</Text>
+          <Text style={styles.subText}>Smarter care. Faster access</Text>
         </Pressable>
 
+        {/* Doctor */}
         <Pressable
-          style={styles.btn}
-          onPress={() => router.replace("./doctor-login")}
+          style={({ pressed }) => [
+            styles.doctorBtn,
+            pressed && styles.pressedOutline,
+          ]}
+          onPress={() => router.replace("/doctor-login")}
         >
-          <Text style={styles.btnText}>Continue as Doctor</Text>
+          <Text style={styles.doctorText}>Continue as Doctor</Text>
+          <Text style={styles.subTextOutline}>
+            Manage patients & consultations
+          </Text>
         </Pressable>
       </View>
+
+      {/* Footer */}
+      <Text style={styles.footer}>© 2026 CareFast HealthTech</Text>
     </View>
   );
 }
@@ -35,48 +68,148 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#ffffff",
-    justifyContent: "center",
+    alignItems: "center",
+    paddingTop: 70,
+    paddingBottom: 40,
+    justifyContent: "space-between",
+  },
+
+  /* Background shapes */
+  bgCircleOne: {
+    position: "absolute",
+    width: 260,
+    height: 260,
+    borderRadius: 130,
+    backgroundColor: "#fee2e2",
+    top: -80,
+    right: -80,
+    opacity: 0.6,
+  },
+  bgCircleTwo: {
+    position: "absolute",
+    width: 320,
+    height: 320,
+    borderRadius: 160,
+    backgroundColor: "#fef2f2",
+    bottom: -120,
+    left: -120,
+  },
+
+  /* Header */
+  header: {
     alignItems: "center",
   },
-  sketch: {
-    position: "absolute",
-    fontSize: 120,
-    opacity: 0.07,
+  brand: {
+    fontSize: 36,
+    fontWeight: "800",
+    color: "#111827",
+    letterSpacing: 0.8,
   },
-  topLeft: { top: 40, left: 20 },
-  topRight: { top: 60, right: 20 },
-  bottomLeft: { bottom: 80, left: 30 },
-  bottomRight: { bottom: 60, right: 30 },
+  ecgLine: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 6,
+    marginBottom: 10,
+  },
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "#dc2626",
+  },
+  line: {
+    width: 36,
+    height: 2,
+    backgroundColor: "#dc2626",
+    marginHorizontal: 8,
+  },
+  tagline: {
+    fontSize: 14,
+    color: "#6b7280",
+    marginTop: 2,
+  },
+
+  /* Card */
   card: {
-    width: "85%",
-    maxWidth: 360,
-    padding: 28,
-    borderRadius: 18,
-    backgroundColor: "#fff",
-    elevation: 6,
+    width: "90%",
+    maxWidth: 420,
+    backgroundColor: "#ffffff",
+    padding: 36,
+    borderRadius: 28,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 30,
+    elevation: 12,
   },
   title: {
-    fontSize: 26,
+    fontSize: 22,
     fontWeight: "700",
+    color: "#111827",
     textAlign: "center",
-    marginBottom: 6,
   },
-  subtitle: {
+  desc: {
     fontSize: 14,
     color: "#6b7280",
     textAlign: "center",
-    marginBottom: 28,
+    marginTop: 8,
+    marginBottom: 30,
   },
-  btn: {
+
+  /* Patient button */
+  patientBtn: {
     backgroundColor: "#dc2626",
-    paddingVertical: 14,
-    borderRadius: 12,
-    marginBottom: 14,
+    paddingVertical: 18,
+    borderRadius: 20,
+    alignItems: "center",
+    marginBottom: 18,
+    shadowColor: "#dc2626",
+    shadowOpacity: 0.4,
+    shadowRadius: 14,
+    elevation: 6,
   },
-  btnText: {
-    color: "#fff",
-    textAlign: "center",
-    fontWeight: "600",
-    fontSize: 16,
+  patientText: {
+    color: "#ffffff",
+    fontSize: 18,
+    fontWeight: "700",
+  },
+
+  /* Doctor button */
+  doctorBtn: {
+    borderWidth: 2,
+    borderColor: "#dc2626",
+    paddingVertical: 18,
+    borderRadius: 20,
+    alignItems: "center",
+  },
+  doctorText: {
+    color: "#dc2626",
+    fontSize: 18,
+    fontWeight: "700",
+  },
+
+  /* Subtexts */
+  subText: {
+    color: "#fee2e2",
+    fontSize: 13,
+    marginTop: 4,
+  },
+  subTextOutline: {
+    color: "#991b1b",
+    fontSize: 13,
+    marginTop: 4,
+  },
+
+  /* Interactions */
+  pressed: {
+    transform: [{ scale: 0.97 }],
+  },
+  pressedOutline: {
+    backgroundColor: "#fef2f2",
+    transform: [{ scale: 0.97 }],
+  },
+
+  footer: {
+    fontSize: 12,
+    color: "#9ca3af",
   },
 });
