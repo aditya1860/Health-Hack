@@ -1,20 +1,52 @@
-import { View, Text, StyleSheet } from "react-native";
-import OverviewCards from "./OverviewCards";
-import PatientList from "./PatientList";
-import EmergencyHistory from "./EmergencyHistory";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { useRouter } from "expo-router";
 
 export default function DoctorDashboard() {
+  const router = useRouter();
+
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Doctor Dashboard</Text>
+      <Text style={styles.title}>Doctor Dashboard</Text>
 
-      <OverviewCards />
+      {/* Patients */}
+      <TouchableOpacity
+        style={styles.card}
+        onPress={() => router.push("/doctor/patients")}
+        activeOpacity={0.7}
+      >
+        <Text style={styles.icon}>👨‍⚕️</Text>
+        <Text style={styles.text}>Patients</Text>
+      </TouchableOpacity>
 
-      <Text style={styles.section}>Patients</Text>
-      <PatientList />
+      {/* Appointments */}
+      <TouchableOpacity
+        style={styles.card}
+        onPress={() => router.push("/doctor/appointments")}
+        activeOpacity={0.7}
+      >
+        <Text style={styles.icon}>📅</Text>
+        <Text style={styles.text}>Appointments</Text>
+      </TouchableOpacity>
 
-      <Text style={styles.section}>Recent Emergencies</Text>
-      <EmergencyHistory />
+      {/* Emergencies */}
+      <TouchableOpacity
+        style={styles.card}
+        onPress={() => router.push("/doctor/emergencies")}
+        activeOpacity={0.7}
+      >
+        <Text style={styles.icon}>🚨</Text>
+        <Text style={styles.text}>Emergencies</Text>
+      </TouchableOpacity>
+
+      {/* Analytics */}
+      <TouchableOpacity
+        style={styles.card}
+        onPress={() => router.push("/doctor/analytics")}
+        activeOpacity={0.7}
+      >
+        <Text style={styles.icon}>📊</Text>
+        <Text style={styles.text}>Analytics</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -22,18 +54,28 @@ export default function DoctorDashboard() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
-    padding: 16
+    padding: 20,
+    backgroundColor: "#FFFFFF"
   },
-  header: {
+  title: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#2563EB",
-    marginBottom: 12
+    marginBottom: 20
   },
-  section: {
-    fontSize: 18,
-    fontWeight: "600",
-    marginVertical: 10
+  card: {
+    backgroundColor: "#F3F4F6",
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    flexDirection: "row",
+    alignItems: "center"
+  },
+  icon: {
+    fontSize: 20,
+    marginRight: 12
+  },
+  text: {
+    fontSize: 16,
+    fontWeight: "500"
   }
 });
