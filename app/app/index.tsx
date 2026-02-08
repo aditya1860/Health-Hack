@@ -1,26 +1,46 @@
-import { View, Text } from 'react-native';
-import { useEffect } from 'react';
-import { router, useRootNavigationState } from 'expo-router';
-import { useEmergency } from '../context/EmergencyContext';
+import { View, Text } from "react-native";
+import { router, useRootNavigationState } from "expo-router";
+import { useEmergency } from "../context/EmergencyContext";
+import { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Index() {
   const navState = useRootNavigationState();
-  const { role, loading } = useEmergency();
+  const { role, loading: emergencyLoading } = useEmergency();
+  const [onboardingLoading, setOnboardingLoading] = useState(true);
 
   useEffect(() => {
-    if (!navState?.key || loading) return;
+    const checkOnboarding = async () => {
+      const done = await AsyncStorage.getItem("onboardingDone");
+
+      if (!done) {
+        router.replace("/onboarding");
+        return;
+      }
+
+      setOnboardingLoading(false);
+    };
+
+    checkOnboarding();
+  }, []);
+
+  useEffect(() => {
+    if (!navState?.key) return;
+    if (onboardingLoading || emergencyLoading) return;
 
     if (!role) {
-      router.replace('/role-select');
-    } else if (role === 'doctor') {
-      router.replace('/doctor');
+      router.replace("/role-select");
+    } else if (role === "doctor") {
+      router.replace("/doctor");
     } else {
-      router.replace('/patient');
+      router.replace("/patient");
     }
-  }, [navState, loading, role]);
+  }, [navState, onboardingLoading, emergencyLoading, role]);
+
+  if (onboardingLoading || emergencyLoading) return null;
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <Text>Loading CAREFAST…</Text>
     </View>
   );

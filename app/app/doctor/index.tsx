@@ -7,15 +7,26 @@ export default function DoctorDashboard() {
   const router = useRouter();
 
   // 🔐 OUR PART: protect route
-  useEffect(() => {
-    const checkAuth = async () => {
-      const user = await getSession();
-      if (!user || user.role !== "doctor") {
-        router.replace("/doctor-login");
-      }
-    };
-    checkAuth();
-  }, []);
+useEffect(() => {
+  let isMounted = true;
+
+  const checkAuth = async () => {
+    const user = await getSession();
+
+    if (!isMounted) return;
+
+    if (!user || user.role !== "doctor") {
+      router.replace("/role-select");
+    }
+  };
+
+  checkAuth();
+
+  return () => {
+    isMounted = false;
+  };
+}, []);
+
 
   // 🔐 OUR PART: logout
   const handleLogout = async () => {
