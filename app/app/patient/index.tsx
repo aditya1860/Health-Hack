@@ -1,14 +1,16 @@
 import { View, Text, Pressable } from 'react-native';
 import { useEffect } from 'react';
-import { router } from 'expo-router';
+import { router , Href} from 'expo-router';
 import { getSession, logout } from '../../utils/storage';
+
+
 
 export default function PatientDashboard() {
   useEffect(() => {
     const check = async () => {
       const user = await getSession();
       if (!user || user.role !== 'patient') {
-        router.replace('/patient-login');
+        router.replace('/patient-login' as Href);
       }
     };
     check();

@@ -8,25 +8,14 @@ export default function EmergencyScreen() {
   const [emergencyType, setEmergencyType] = useState<EmergencyKey | null>(null);
   const { stopEmergency } = useEmergency();
 
-  const handleSelectType = (type: EmergencyKey) => {
-    setEmergencyType(type);
-    // Type is selected, which triggers location sharing in ActiveEmergency component
-  };
-
-  const handleCancelEmergency = () => {
-    stopEmergency();
-  };
-
-  // Show greeting screen until emergency type is selected
   if (!emergencyType) {
-    return <EmergencyGreeting onSelectType={handleSelectType} />;
+    return <EmergencyGreeting onSelectType={setEmergencyType} />;
   }
 
-  // Show active emergency screen with guidance
   return (
-    <ActiveEmergency 
+    <ActiveEmergency
       emergencyType={emergencyType}
-      onCancel={handleCancelEmergency}
+      onCancel={stopEmergency}
     />
   );
 }

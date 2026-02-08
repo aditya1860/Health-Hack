@@ -1,23 +1,21 @@
-import { useEffect } from 'react';
-import { Slot, router, usePathname } from 'expo-router';
-import { getSession } from '../utils/storage';
+import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { EmergencyProvider } from '../context/EmergencyContext';
+import { useColorScheme } from '../hooks/use-color-scheme';
 
 export default function RootLayout() {
-  const pathname = usePathname();
+  const colorScheme = useColorScheme();
 
-  useEffect(() => {
-    const checkSession = async () => {
-      const user = await getSession();
-
-      if (user && pathname.startsWith('/(auth)')) {
-        router.replace(
-          user.role === 'patient' ? '/patient' : '/doctor'
-        );
-      }
-    };
-
-    checkSession();
-  }, [pathname]);
-
-  return <Slot />;
+  return (
+    <EmergencyProvider>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <Stack
+          screenOptions={{ headerShown: false }}
+          initialRouteName="index"
+        />
+        <StatusBar style="auto" />
+      </ThemeProvider>
+    </EmergencyProvider>
+  );
 }
