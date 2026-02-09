@@ -10,6 +10,10 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { findUserByPhone, setSession } from '../../utils/storage';
+import { useEmergency } from "../context/EmergencyContext";
+import { Keyboard } from "react-native";
+
+
 
 const OTP = '1234';
 
@@ -17,9 +21,12 @@ export default function DoctorLogin() {
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [step, setStep] = useState<1 | 2>(1);
+  const { setRole } = useEmergency();
+
 
   // ✅ SEND OTP (POPUP WORKS ON WEB + MOBILE)
   const sendOtp = () => {
+    if (step !== 1) return;
     if (phone.length !== 10) {
       if (Platform.OS === 'web') {
         window.alert('Enter valid mobile number');
@@ -41,22 +48,38 @@ export default function DoctorLogin() {
   };
 
   // ✅ VERIFY OTP
-  const verifyOtp = async () => {
+const verifyOtp = async () => {
+  try {
     if (otp !== OTP) {
-      Alert.alert('Invalid OTP');
+      Alert.alert("Invalid OTP");
       return;
     }
 
-    const user = await findUserByPhone(phone, 'doctor');
+    const user = await findUserByPhone(phone, "doctor");
+
+    if (!user) {
+      Alert.alert("Doctor not found");
+      return;
+    }
+
     const sessionUser = {
-    ...user,
-    role: 'doctor',
-  };
+      ...user,
+      role: "doctor",
+    };
+    
+Keyboard.dismiss();
+
+    await setSession(sessionUser);
+    setRole("doctor");
+
+    router.replace("/doctor");
+  } catch (error) {
+    Alert.alert("Login failed", "Please try again");
+    console.error(error);
+  }
+};
 
 
-    await setSession(user);
-    router.replace('/doctor')
-  };
 
   return (
     <View style={styles.container}>
@@ -72,7 +95,9 @@ export default function DoctorLogin() {
               placeholder="+91 Mobile Number"
               keyboardType="number-pad"
               value={phone}
-              onChangeText={setPhone}
+              onChangeText={(text) =>
+  setPhone(text.replace(/[^0-9]/g, ""))
+}
               style={styles.input}
             />
             <Pressable style={styles.btn} onPress={sendOtp}>

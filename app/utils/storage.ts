@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+
 const USERS_KEY = 'USERS_DB';
 const SESSION_KEY = 'CURRENT_USER';
 
@@ -31,8 +32,18 @@ export const setSession = async (user: any) => {
 
 // get logged in user
 export const getSession = async () => {
-  const data = await AsyncStorage.getItem(SESSION_KEY);
-  return data ? JSON.parse(data) : null;
+  try {
+    const data = await AsyncStorage.getItem("session");
+
+    if (!data) {
+      return null; // 👈 CRITICAL
+    }
+
+    return JSON.parse(data);
+  } catch (error) {
+    console.error("Failed to parse session:", error);
+    return null;
+  }
 };
 
 // logout (FIXED NAME)

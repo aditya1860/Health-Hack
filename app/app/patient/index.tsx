@@ -21,9 +21,9 @@ useEffect(() => {
   let isMounted = true;
 
   const init = async () => {
-     if (roleLoading) return;
+    if (roleLoading) return;
 
-     const user = await getSession();
+    const user = await getSession();
 
     if (!isMounted) return;
 
@@ -40,7 +40,7 @@ useEffect(() => {
   return () => {
     isMounted = false;
   };
-}, []);
+}, [roleLoading]);
 
 
   const handleLogout = async () => {
