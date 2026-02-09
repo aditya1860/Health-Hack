@@ -1,64 +1,42 @@
 import { View, Text } from "react-native";
-import { router, useRootNavigationState } from "expo-router";
+import { router } from "expo-router";
 import { useEmergency } from "../context/EmergencyContext";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getSession } from "../utils/storage";
 
-
 export default function Index() {
-  const navState = useRootNavigationState();
-  const {loading: emergencyLoading } = useEmergency();
-  const [onboardingLoading, setOnboardingLoading] = useState(true);
-  const [onboardingDone, setOnboardingDone] = useState<boolean | null>(null);
+  const { loading: emergencyLoading } = useEmergency();
 
+  useEffect(() => {
+    if (emergencyLoading) return;
 
-useEffect(() => {
-  const checkOnboarding = async () => {
-    const done = await AsyncStorage.getItem("onboardingDone");
-    setOnboardingDone(done === "true");
-    setOnboardingLoading(false);
-  };
+    const init = async () => {
+      try {
+        const done = await AsyncStorage.getItem("onboardingDone");
 
-  checkOnboarding();
-}, []);
+        if (done !== "true") {
+          router.replace("/onboarding");
+          return;
+        }
 
+        const session = await getSession();
 
-useEffect(() => {
-  const resolveRoute = async () => {
-    if (!navState?.key) return;
-    if (onboardingLoading) return;
-    if (onboardingDone === null) return;
+        if (!session) {
+          router.replace("/role-select");
+          return;
+        }
 
-    if (!onboardingDone) {
-      router.replace("/onboarding");
-      return;
-    }
+        router.replace(
+          session.role === "doctor" ? "/doctor" : "/patient"
+        );
+      } catch (e) {
+        console.log("Root routing error:", e);
+      }
+    };
 
-    const session = await getSession();
-
-    if (!session) {
-      router.replace("/role-select");
-      return;
-    }
-
-    if (session.role === "doctor") {
-      router.replace("/doctor");
-    } else {
-      router.replace("/patient");
-    }
-  };
-
-  resolveRoute();
-}, [navState, onboardingLoading, onboardingDone]);
-
-if (onboardingLoading || emergencyLoading) {
-  return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Loading CAREFAST…</Text>
-    </View>
-  );
-}
+    init();
+  }, [emergencyLoading]);
 
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>

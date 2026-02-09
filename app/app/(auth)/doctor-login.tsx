@@ -153,7 +153,7 @@ Keyboard.dismiss();
 
     await setSession(sessionUser);
 
-    router.replace("/doctor");
+    router.replace("/");
   } catch (error) {
     Alert.alert("Login failed", "Please try again");
     console.error(error);

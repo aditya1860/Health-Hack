@@ -30,15 +30,8 @@ export default function PatientDashboard() {
     const init = async () => {
       if (roleLoading) return;
 
-      const user = await getSession();
 
       if (!isMounted) return;
-
-      if (!user || user.role !== "patient") {
-        router.replace("/role-select");
-        return;
-      }
-
       setLoading(false);
     };
 

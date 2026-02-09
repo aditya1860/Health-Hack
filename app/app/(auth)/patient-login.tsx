@@ -59,9 +59,9 @@ export default function PatientLogin() {
       return;
     }
 
-    await setSession(user);      // save session
-    await setRole('patient');    // 🔥 MUST await
-    router.replace('/patient');  // ✅ redirect works
+    await setSession(user);      
+    await setRole('patient');    
+    router.replace('/');   
   };
 
   
@@ -173,7 +173,7 @@ return (
               />
               <Pressable
                 style={styles.btn}
-                onPress={() => router.replace("/patient")}
+                onPress={verifyOtp}
               >
                 <Text style={styles.btnText}>Verify & Login</Text>
               </Pressable>
