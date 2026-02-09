@@ -1,12 +1,11 @@
-
 import {
   View,
   Text,
   StyleSheet,
-  Image,
   TouchableOpacity,
   useWindowDimensions,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 
 import { useEffect, useState } from "react";
@@ -15,126 +14,205 @@ import { useRouter } from "expo-router";
 import Header from "./components/Header";
 import StatusCard from "./components/StatusCard";
 import EmergencyCard from "./components/EmergencyCard";
+import CheckInCalendar from "./components/CheckInCalendar";
 import { useEmergency } from "../../context/EmergencyContext";
+import { getSession } from "../../utils/storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function PatientDashboard() {
   const router = useRouter();
   const { width } = useWindowDimensions();
 
-  /* BREAKPOINTS */
   const isTablet = width >= 768;
-  const isLargeTablet = width >= 1024;
 
   const { role, loading: roleLoading } = useEmergency();
   const [loading, setLoading] = useState(true);
+  const [userName, setUserName] = useState("User");
+  const [lastCheckIn, setLastCheckIn] = useState<any>(null);
+  const [riskLevel, setRiskLevel] = useState("Low Risk");
+  const [medicineStreak, setMedicineStreak] = useState(0);
+  const [emergencyContacts, setEmergencyContacts] = useState(3);
 
   useEffect(() => {
-    if (!roleLoading) setLoading(false);
+    loadDashboardData();
   }, [roleLoading]);
+
+  const loadDashboardData = async () => {
+    try {
+      const session = await getSession();
+      if (session && session.name) {
+        setUserName(session.name);
+      }
+
+      const lastCheckInData = await AsyncStorage.getItem("LAST_CHECKIN");
+      if (lastCheckInData) {
+        const parsed = JSON.parse(lastCheckInData);
+        setLastCheckIn(parsed);
+        setRiskLevel(parsed.riskLevel || "Low Risk");
+      }
+
+      const streakData = await AsyncStorage.getItem("MEDICINE_STREAK");
+      if (streakData) {
+        setMedicineStreak(parseInt(streakData));
+      }
+
+      const contactsData = await AsyncStorage.getItem("EMERGENCY_CONTACTS");
+      if (contactsData) {
+        const contacts = JSON.parse(contactsData);
+        setEmergencyContacts(contacts.length);
+      }
+    } catch (error) {
+      console.error("Error loading dashboard data:", error);
+    } finally {
+      if (!roleLoading) setLoading(false);
+    }
+  };
+
+  const getLastCheckInText = () => {
+    if (!lastCheckIn || !lastCheckIn.timestamp) return "No recent check-in";
+
+    const timestamp = new Date(lastCheckIn.timestamp);
+    const now = new Date();
+    const diffMs = now.getTime() - timestamp.getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffHours < 1) return "Just now";
+    if (diffHours < 24) return `${diffHours} hours ago`;
+    if (diffDays === 1) return "Yesterday";
+    if (diffDays < 7) return `${diffDays} days ago`;
+    return timestamp.toLocaleDateString();
+  };
+
+  const getRiskColor = () => {
+    if (riskLevel.includes("High")) return "#EF4444";
+    if (riskLevel.includes("Medium")) return "#F59E0B";
+    return "#10B981";
+  };
 
   if (loading || roleLoading) {
     return (
       <View style={styles.center}>
-        <Text>Loading...</Text>
+        <ActivityIndicator size="large" color="#2563EB" />
+        <Text style={styles.loadingText}>Loading your dashboard...</Text>
       </View>
     );
   }
 
   return (
     <ScrollView style={styles.container}>
-      <Header />
-
-      {/* MAIN WRAPPER */}
       <View
         style={[
           styles.wrapper,
           isTablet && styles.wrapperTablet,
         ]}
       >
-        {/* Emergency Card → Top on mobile */}
-        <EmergencyCard />
+        <Header />
 
-        {/* CONTENT */}
-        <View style={styles.content}>
-          <Text style={styles.welcome}>
-            Welcome to Your Health Dashboard
-          </Text>
-
+        {/* WELCOME SECTION */}
+        <View style={styles.welcomeSection}>
+          <Text style={styles.welcome}>Welcome back, {userName}</Text>
           <Text style={styles.sub}>
             Monitor your health, track risks and get help
           </Text>
+        </View>
 
-          {/* RESPONSIVE BANNER */}
-          <Image
-            source={{
-              uri: "https://images.unsplash.com/photo-1588776814546-ec7e9b9d55d7",
-            }}
-            style={[
-              styles.banner,
-              { height: width * 0.4 },
-            ]}
+        {/* STATUS CARDS */}
+        <View
+          style={[
+            styles.cardContainer,
+            isTablet && styles.cardRowTablet,
+          ]}
+        >
+          <StatusCard
+            title="Today's Status"
+            value={riskLevel}
+            sub={`Last checked: ${getLastCheckInText()}`}
+            valueColor={getRiskColor()}
           />
 
-          {/* BUTTONS */}
-          <View
-            style={[
-              styles.btnContainer,
-              isTablet && styles.btnRowTablet,
-            ]}
-          >
-            <TouchableOpacity
-              style={styles.blueBtn}
-              onPress={() =>
-                router.push("/patient/checkin")
-              }
-            >
-              <Text style={styles.btnText}>
-                Start Health Check
-              </Text>
-            </TouchableOpacity>
+          <StatusCard
+            title="Medicine Adherence"
+            value={medicineStreak > 0 ? `${medicineStreak} Day Streak` : "Start Today"}
+            sub={medicineStreak > 0 ? "Keep it up!" : "Track your medicine"}
+          />
 
-            <TouchableOpacity
-              style={styles.redBtn}
-              onPress={() =>
-                router.push("/emergency")
-              }
-            >
-              <Text style={styles.btnText}>
-                Emergency Help
-              </Text>
-            </TouchableOpacity>
+          <StatusCard
+            title="Emergency Contacts"
+            value={`${emergencyContacts} Contact${emergencyContacts !== 1 ? 's' : ''}`}
+            sub={emergencyContacts > 0 ? "Ready to alert" : "Add contacts"}
+          />
+        </View>
+
+        {/* CHECK-IN CALENDAR */}
+        <View style={styles.sectionSpacing}>
+          <CheckInCalendar />
+        </View>
+
+        {/* EMERGENCY CARD */}
+        <View style={styles.sectionSpacing}>
+          <EmergencyCard />
+        </View>
+
+        {/* PRIMARY ACTION */}
+        <TouchableOpacity
+          style={styles.primaryBtn}
+          onPress={() => router.push("/patient/checkin")}
+        >
+          <Text style={styles.primaryBtnText}>Start Health Check</Text>
+        </TouchableOpacity>
+
+        {/* LAST CHECK-IN DETAILS */}
+        {lastCheckIn && (
+          <View style={styles.detailsCard}>
+            <Text style={styles.detailsTitle}>Latest Health Metrics</Text>
+            <View style={styles.metricsGrid}>
+              {lastCheckIn.sugar && (
+                <View style={styles.metric}>
+                  <Text style={styles.metricLabel}>Blood Sugar</Text>
+                  <Text style={styles.metricValue}>{lastCheckIn.sugar} mg/dL</Text>
+                </View>
+              )}
+              {lastCheckIn.heartRate && (
+                <View style={styles.metric}>
+                  <Text style={styles.metricLabel}>Heart Rate</Text>
+                  <Text style={styles.metricValue}>{lastCheckIn.heartRate} bpm</Text>
+                </View>
+              )}
+              {lastCheckIn.bloodPressure && (
+                <View style={styles.metric}>
+                  <Text style={styles.metricLabel}>Blood Pressure</Text>
+                  <Text style={styles.metricValue}>{lastCheckIn.bloodPressure}</Text>
+                </View>
+              )}
+              {lastCheckIn.oxygen && (
+                <View style={styles.metric}>
+                  <Text style={styles.metricLabel}>Oxygen Level</Text>
+                  <Text style={styles.metricValue}>{lastCheckIn.oxygen}%</Text>
+                </View>
+              )}
+            </View>
+            {lastCheckIn.explanation && (
+              <View style={styles.explanationBox}>
+                <Text style={styles.explanationLabel}>Assessment</Text>
+                <Text style={styles.explanation}>{lastCheckIn.explanation}</Text>
+              </View>
+            )}
           </View>
+        )}
 
-          {/* STATUS CARDS */}
-          <View
-            style={[
-              styles.cardContainer,
-              isTablet && styles.cardRowTablet,
-            ]}
-          >
-            <StatusCard
-              title="Today's Status"
-              value="Low Risk"
-              sub="Last checked: Today"
-            />
-
-            <StatusCard
-              title="Medicine Adherence"
-              value="7 Day Streak"
-              sub="Keep it up!"
-            />
-
-            <StatusCard
-              title="Emergency Contacts"
-              value="3 Contacts"
-              sub="Ready to alert"
-            />
-          </View>
+        {/* HEALTH TIP */}
+        <View style={styles.tipCard}>
+          <Text style={styles.tipTitle}>Daily Health Tip</Text>
+          <Text style={styles.tipText}>
+            Consistent daily check-ins help establish patterns and detect early warning signs. Your 14-day streak tracker above shows your commitment to health monitoring.
+          </Text>
         </View>
       </View>
     </ScrollView>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -147,80 +225,165 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
-  /* WRAPPER */
+  loadingText: {
+    marginTop: 12,
+    color: "#6B7280",
+    fontSize: 14,
+  },
+
   wrapper: {
     padding: 16,
+    paddingBottom: 32,
   },
 
   wrapperTablet: {
     maxWidth: 900,
     alignSelf: "center",
     width: "100%",
+    padding: 24,
   },
 
-  /* CONTENT */
-  content: {
-    marginTop: 16,
+  welcomeSection: {
+    marginTop: 8,
+    marginBottom: 20,
   },
 
   welcome: {
-    fontSize: 22,
-    fontWeight: "bold",
+    fontSize: 24,
+    fontWeight: "700",
     marginBottom: 4,
+    color: "#111827",
   },
 
   sub: {
+    fontSize: 14,
     color: "#6B7280",
-    marginBottom: 12,
+    lineHeight: 20,
   },
 
-  /* BANNER */
-  banner: {
-    width: "100%",
-    borderRadius: 14,
-    marginBottom: 16,
-  },
-
-  /* BUTTONS */
-  btnContainer: {
+  cardContainer: {
     flexDirection: "column",
     gap: 12,
     marginBottom: 20,
   },
 
-  btnRowTablet: {
-    flexDirection: "row",
-  },
-
-  blueBtn: {
-    flex: 1,
-    backgroundColor: "#2563EB",
-    padding: 16,
-    borderRadius: 12,
-    alignItems: "center",
-  },
-
-  redBtn: {
-    flex: 1,
-    backgroundColor: "#EF4444",
-    padding: 16,
-    borderRadius: 12,
-    alignItems: "center",
-  },
-
-  btnText: {
-    color: "#FFF",
-    fontWeight: "600",
-    fontSize: 15,
-  },
-
-  /* CARDS */
-  cardContainer: {
-    flexDirection: "column",
-    gap: 12,
-  },
-
   cardRowTablet: {
     flexDirection: "row",
+  },
+
+  sectionSpacing: {
+    marginBottom: 16,
+  },
+
+  primaryBtn: {
+    backgroundColor: "#2563EB",
+    padding: 18,
+    borderRadius: 12,
+    alignItems: "center",
+    marginTop: 8,
+    marginBottom: 24,
+    elevation: 3,
+    shadowColor: "#2563EB",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+  },
+
+  primaryBtnText: {
+    color: "#FFF",
+    fontWeight: "700",
+    fontSize: 16,
+    letterSpacing: 0.5,
+  },
+
+  detailsCard: {
+    backgroundColor: "#FFFFFF",
+    padding: 20,
+    borderRadius: 14,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    marginBottom: 16,
+  },
+
+  detailsTitle: {
+    fontSize: 17,
+    fontWeight: "700",
+    marginBottom: 16,
+    color: "#111827",
+  },
+
+  metricsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+
+  metric: {
+    flex: 1,
+    minWidth: "47%",
+    backgroundColor: "#F9FAFB",
+    padding: 14,
+    borderRadius: 10,
+    borderLeftWidth: 3,
+    borderLeftColor: "#2563EB",
+  },
+
+  metricLabel: {
+    fontSize: 12,
+    color: "#6B7280",
+    marginBottom: 4,
+    fontWeight: "500",
+  },
+
+  metricValue: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#111827",
+  },
+
+  explanationBox: {
+    marginTop: 16,
+    padding: 14,
+    backgroundColor: "#F0F9FF",
+    borderRadius: 10,
+    borderLeftWidth: 3,
+    borderLeftColor: "#2563EB",
+  },
+
+  explanationLabel: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#1E40AF",
+    marginBottom: 4,
+  },
+
+  explanation: {
+    fontSize: 13,
+    color: "#1E3A8A",
+    lineHeight: 19,
+  },
+
+  tipCard: {
+    backgroundColor: "#FEF3C7",
+    padding: 16,
+    borderRadius: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: "#F59E0B",
+  },
+
+  tipTitle: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#92400E",
+    marginBottom: 6,
+  },
+
+  tipText: {
+    fontSize: 13,
+    color: "#78350F",
+    lineHeight: 19,
   },
 });

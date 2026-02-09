@@ -3,67 +3,102 @@ import { router } from 'expo-router';
 
 export default function EmergencyCard() {
   return (
-    <View style={styles.card}>
-      <Text style={styles.title}>Emergency Assistance</Text>
-
-      <Text style={styles.sub}>
-        Press this button if you need immediate medical help
-      </Text>
-
     <TouchableOpacity
-      style={styles.button}
+      style={styles.card}
       onPress={() => router.push('/emergency')}
+      activeOpacity={0.9}
     >
-      <Text style={styles.btnText}>
-        I NEED{"\n"}HELP NOW
-      </Text>
-    </TouchableOpacity>
+      <View style={styles.iconContainer}>
+        <View style={styles.icon}>
+          <Text style={styles.iconText}>SOS</Text>
+        </View>
+      </View>
+      
+      <View style={styles.content}>
+        <Text style={styles.title}>Emergency Assistance</Text>
+        <Text style={styles.subtitle}>Tap to alert your emergency contacts</Text>
+      </View>
 
-      <Text style={styles.footer}>
-        This will alert your emergency contacts
-      </Text>
-    </View>
+      <View style={styles.arrow}>
+        <Text style={styles.arrowText}>→</Text>
+      </View>
+    </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    width: 260,
+    width: '100%',
     backgroundColor: "#FEE2E2",
-    padding: 20,
+    padding: 18,
     borderRadius: 16,
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    elevation: 2,
+    shadowColor: "#DC2626",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    borderLeftWidth: 5,
+    borderLeftColor: "#EF4444",
+  },
+
+  iconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: "#EF4444",
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 4,
+    shadowColor: "#DC2626",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+
+  icon: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  iconText: {
+    color: "#FFF",
+    fontSize: 16,
+    fontWeight: "900",
+    letterSpacing: 1,
+  },
+
+  content: {
+    flex: 1,
   },
 
   title: {
-    fontWeight: "bold",
-    marginBottom: 10,
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#991B1B",
+    marginBottom: 2,
   },
 
-  sub: {
-    textAlign: "center",
-    marginBottom: 20,
-    color: "#7F1D1D",
-  },
-
-  button: {
-    backgroundColor: "#EF4444",
-    width: 160,
-    height: 160,
-    borderRadius: 80,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 16,
-  },
-
-  btnText: {
-    color: "#FFF",
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-
-  footer: {
-    textAlign: "center",
+  subtitle: {
     fontSize: 12,
+    color: "#7F1D1D",
+    fontWeight: "500",
+  },
+
+  arrow: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "#DC2626",
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  arrowText: {
+    color: "#FFF",
+    fontSize: 18,
+    fontWeight: "700",
   },
 });
