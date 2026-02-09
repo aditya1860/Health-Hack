@@ -4,6 +4,8 @@ import EmergencyGreeting from "./EmergencyGreeting";
 import EmergencyProtocol from "./EmergencyProtocol";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getSession } from "../../utils/storage";
+import CommonBackButton from "../../components/CommonBackButton";
+
 
 
 export default function Emergency() {

@@ -1,6 +1,12 @@
 import { View, Text, StyleSheet, Pressable, ScrollView, Alert } from "react-native";
 import { useState, useEffect } from "react";
 import { EmergencyKey } from "./emergencyGuide";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getSession } from "../../utils/storage";
+import CommonBackButton from "../../components/CommonBackButton";
+import { router } from "expo-router";
+
+
 
 
 interface EmergencyProtocolProps {
@@ -150,6 +156,57 @@ export default function EmergencyProtocol({ emergencyType, onBack }: EmergencyPr
     }
   };
 
+  const handleExitEmergency = async () => {
+  const session = await getSession();
+
+  if (session?.phone) {
+    const phone = session.phone;
+    const key = `EMERGENCY_LOG_${phone}`;
+
+    const data = await AsyncStorage.getItem(key);
+    if (data) {
+      const logs = JSON.parse(data);
+
+      for (let i = logs.length - 1; i >= 0; i--) {
+        if (!logs[i].endedAt) {
+          logs[i].endedAt = new Date().toISOString();
+          break;
+        }
+      }
+
+      await AsyncStorage.setItem(key, JSON.stringify(logs));
+    }
+
+    if (session.doctorPhone) {
+      const notifKey = `DOCTOR_NOTIFICATIONS_${session.doctorPhone}`;
+      const existing = await AsyncStorage.getItem(notifKey);
+      const notifications = existing ? JSON.parse(existing) : [];
+
+      notifications.unshift({
+        id: Date.now().toString(),
+        type: "EMERGENCY_RESOLVED",
+        patientPhone: session.phone,
+        patientName: session.name || "Patient",
+        resolvedAt: new Date().toISOString(),
+        message: "Patient exited emergency mode and marked themselves safe",
+        read: false,
+      });
+
+      await AsyncStorage.setItem(
+        notifKey,
+        JSON.stringify(notifications.slice(0, 50))
+      );
+    }
+  }
+
+  if (onBack) {
+    onBack();
+  } else {
+    router.replace("/");
+  }
+};
+
+
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -160,16 +217,13 @@ export default function EmergencyProtocol({ emergencyType, onBack }: EmergencyPr
               <Text style={styles.alertIconText}>!</Text>
             </View>
             <View style={styles.headerTextContainer}>
-              <Text style={styles.headerTitle}>EMERGENCY MODE</Text>
+              <Text style={styles.headerTitle}>Emergency Mode</Text>
               <Text style={styles.headerSubtitle}>{protocol.title}</Text>
             </View>
           </View>
           <View style={styles.timerContainer}>
-            <Text style={styles.timerIcon}>🕐</Text>
-            <View>
-              <Text style={styles.timerText}>{formatTime(timeElapsed)}</Text>
-              <Text style={styles.timerLabel}>Time elapsed</Text>
-            </View>
+            <Text style={styles.timerText}>{formatTime(timeElapsed)}</Text>
+            <Text style={styles.timerLabel}>elapsed</Text>
           </View>
         </View>
       </View>
@@ -182,7 +236,7 @@ export default function EmergencyProtocol({ emergencyType, onBack }: EmergencyPr
             onPress={() => setActiveTab("immediate")}
           >
             <Text style={[styles.tabText, activeTab === "immediate" && styles.tabTextActive]}>
-              1. Immediate Actions
+              Immediate Actions
             </Text>
           </Pressable>
           <Pressable
@@ -190,7 +244,7 @@ export default function EmergencyProtocol({ emergencyType, onBack }: EmergencyPr
             onPress={() => setActiveTab("not")}
           >
             <Text style={[styles.tabText, activeTab === "not" && styles.tabTextActive]}>
-              2. What NOT to Do
+              What NOT to Do
             </Text>
           </Pressable>
           <Pressable
@@ -198,21 +252,18 @@ export default function EmergencyProtocol({ emergencyType, onBack }: EmergencyPr
             onPress={() => setActiveTab("wait")}
           >
             <Text style={[styles.tabText, activeTab === "wait" && styles.tabTextActive]}>
-              3. Wait for Help
+              Wait for Help
             </Text>
           </Pressable>
         </View>
 
+        <CommonBackButton color="#F9FAFB" />
+
+
+        
+
         {/* Action Cards */}
         <View style={styles.actionsContainer}>
-          <View style={styles.actionsHeader}>
-            <Text style={styles.actionsHeaderIcon}>✓</Text>
-            <Text style={styles.actionsHeaderText}>
-              {activeTab === "immediate" && "Immediate Actions - Do These NOW"}
-              {activeTab === "not" && "What NOT to Do - Avoid These"}
-              {activeTab === "wait" && "Wait for Help - Stay Safe"}
-            </Text>
-          </View>
           <View style={styles.actionsList}>
             {getTabContent().map((action, index) => (
               <View key={index} style={styles.actionItem}>
@@ -228,71 +279,79 @@ export default function EmergencyProtocol({ emergencyType, onBack }: EmergencyPr
         {/* Emergency Status */}
         <View style={styles.statusCard}>
           <Text style={styles.cardTitle}>Emergency Status</Text>
+          <View style={styles.divider} />
           <View style={styles.statusItem}>
-            <Text style={styles.statusIcon}>✓</Text>
+            <View style={styles.statusIconContainer}>
+              <Text style={styles.statusIcon}>✓</Text>
+            </View>
             <View style={styles.statusTextContainer}>
-              <Text style={styles.statusTitle}>Family Alerts</Text>
-              <Text style={styles.statusSubtitle}>Sent to 3 contacts</Text>
+              <Text style={styles.statusTitle}>Family Alerts Sent</Text>
+              <Text style={styles.statusSubtitle}>3 contacts notified</Text>
             </View>
           </View>
           <View style={styles.statusItem}>
-            <Text style={styles.statusIcon}>✓</Text>
+            <View style={styles.statusIconContainer}>
+              <Text style={styles.statusIcon}>✓</Text>
+            </View>
             <View style={styles.statusTextContainer}>
-              <Text style={styles.statusTitle}>Clinic Notification</Text>
+              <Text style={styles.statusTitle}>Clinic Notified</Text>
               <Text style={styles.statusSubtitle}>Nearest clinic alerted</Text>
             </View>
           </View>
           <View style={styles.statusItem}>
-            <Text style={styles.statusIcon}>📍</Text>
+            <View style={styles.statusIconContainer}>
+              <Text style={styles.statusIcon}>📍</Text>
+            </View>
             <View style={styles.statusTextContainer}>
               <Text style={styles.statusTitle}>Location Shared</Text>
-              <Text style={styles.statusSubtitle}>Noida , Uttar Pradesh</Text>
+              <Text style={styles.statusSubtitle}>Noida, Uttar Pradesh</Text>
             </View>
           </View>
-          <Pressable style={styles.helpButton}>
-            <Text style={styles.helpButtonText}>Help is on the way</Text>
-          </Pressable>
         </View>
 
         {/* Emergency Contacts */}
         <View style={styles.contactsCard}>
           <Text style={styles.cardTitle}>Emergency Contacts</Text>
-          <Pressable style={[styles.contactButton, styles.contactButtonGreen]}>
+          <View style={styles.divider} />
+          <Pressable style={styles.contactButton}>
             <Text style={styles.contactButtonIcon}>📞</Text>
             <Text style={styles.contactButtonText}>Call Dad</Text>
           </Pressable>
-          <Pressable style={[styles.contactButton, styles.contactButtonBlue]}>
+          <Pressable style={styles.contactButton}>
             <Text style={styles.contactButtonIcon}>📞</Text>
             <Text style={styles.contactButtonText}>Call Dr. Jain</Text>
           </Pressable>
-          <Pressable style={[styles.contactButton, styles.contactButtonRed]}>
+          <Pressable style={styles.contactButton}>
             <Text style={styles.contactButtonIcon}>📞</Text>
             <Text style={styles.contactButtonText}>Call 112 (Ambulance)</Text>
           </Pressable>
         </View>
+
         {/* Exit Emergency */}
+        <Pressable
+          style={styles.exitButton}
+          onPress={() => {
+            Alert.alert(
+              "Exit Emergency Mode",
+              "Are you sure you are safe now?",
+              [
+                { text: "Stay in Emergency", style: "cancel" },
+{
+  text: "Yes, I'm Safe",
+  onPress: () => {
+    setTimeout(() => {
+      handleExitEmergency();
+    }, 0);
+  },
+},
+              ]
+            );
+          }}
+        >
+          <Text style={styles.exitButtonText}>I Feel Safe Now</Text>
+        </Pressable>
 
-
-{onBack && (
-  <View style={styles.exitContainer}>
-    <Pressable
-      style={styles.exitButton}
-      onPress={() => {
-        Alert.alert(
-          "Exit Emergency Mode",
-          "Are you sure you are safe now?",
-          [
-            { text: "Stay in Emergency", style: "cancel" },
-            { text: "Yes, I'm Safe", onPress: onBack },
-          ]
-        );
-      }}
-    >
-      <Text style={styles.exitButtonText}>I feel safe now</Text>
-    </Pressable>
-  </View>
-)}
-
+        
 
         <View style={styles.bottomPadding} />
       </ScrollView>
@@ -303,22 +362,18 @@ export default function EmergencyProtocol({ emergencyType, onBack }: EmergencyPr
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#DC2626",
+    backgroundColor: "#F9FAFB",
   },
   header: {
-    backgroundColor: "#B91C1C",
-    paddingBottom: 16,
+    backgroundColor: "#DC2626",
+    paddingBottom: 20,
+    paddingTop: 16,
   },
   headerTop: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
+    paddingHorizontal: 20,
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "flex-start",
-    gap: 12,
-    borderBottomWidth: 3,
-    borderBottomColor: "#FFFFFF",
-    paddingBottom: 16,
+    alignItems: "center",
   },
   headerLeft: {
     flexDirection: "row",
@@ -327,239 +382,208 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   alertIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: "#FFFFFF",
     justifyContent: "center",
     alignItems: "center",
   },
   alertIconText: {
-    fontSize: 24,
-    fontWeight: "800",
+    fontSize: 26,
+    fontWeight: "700",
     color: "#DC2626",
   },
   headerTextContainer: {
     flex: 1,
   },
   headerTitle: {
-    fontSize: 16,
-    fontWeight: "800",
+    fontSize: 18,
+    fontWeight: "600",
     color: "#FFFFFF",
-    letterSpacing: 0.5,
   },
   headerSubtitle: {
-    fontSize: 12,
+    fontSize: 13,
     color: "#FEE2E2",
-    fontWeight: "500",
+    fontWeight: "400",
     marginTop: 2,
   },
   timerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  timerIcon: {
-    fontSize: 20,
+    alignItems: "flex-end",
   },
   timerText: {
-    fontSize: 20,
-    fontWeight: "800",
+    fontSize: 24,
+    fontWeight: "600",
     color: "#FFFFFF",
   },
   timerLabel: {
-    fontSize: 10,
+    fontSize: 11,
     color: "#FEE2E2",
-    fontWeight: "500",
+    fontWeight: "400",
+    marginTop: 2,
   },
   content: {
     flex: 1,
   },
   tabs: {
     flexDirection: "row",
-    gap: 8,
-    padding: 16,
+    gap: 10,
+    paddingHorizontal: 20,
+    paddingVertical: 20,
   },
   tab: {
     flex: 1,
-    backgroundColor: "#FECACA",
-    paddingVertical: 12,
+    backgroundColor: "#FFFFFF",
+    paddingVertical: 14,
     paddingHorizontal: 8,
-    borderRadius: 8,
+    borderRadius: 10,
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
   },
   tabActive: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#DC2626",
+    borderColor: "#DC2626",
   },
   tabText: {
-    fontSize: 11,
-    fontWeight: "700",
-    color: "#991B1B",
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#6B7280",
     textAlign: "center",
   },
   tabTextActive: {
-    color: "#DC2626",
+    color: "#FFFFFF",
   },
   actionsContainer: {
-    backgroundColor: "#10B981",
-    marginHorizontal: 16,
-    borderRadius: 12,
-    overflow: "hidden",
-    marginBottom: 16,
-  },
-  actionsHeader: {
-    backgroundColor: "#059669",
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
-  actionsHeaderIcon: {
-    fontSize: 20,
-    color: "#FFFFFF",
-  },
-  actionsHeaderText: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: "#FFFFFF",
-    flex: 1,
+    marginHorizontal: 20,
+    marginBottom: 20,
   },
   actionsList: {
-    padding: 12,
-    gap: 10,
+    gap: 12,
   },
   actionItem: {
-    backgroundColor: "#D1FAE5",
-    paddingVertical: 14,
-    paddingHorizontal: 14,
-    borderRadius: 8,
+    backgroundColor: "#FFFFFF",
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderRadius: 12,
     flexDirection: "row",
     alignItems: "flex-start",
-    gap: 12,
+    gap: 14,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
   },
   actionNumber: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "#10B981",
+    backgroundColor: "#DC2626",
     justifyContent: "center",
     alignItems: "center",
     marginTop: 2,
   },
   actionNumberText: {
-    fontSize: 14,
-    fontWeight: "800",
+    fontSize: 15,
+    fontWeight: "600",
     color: "#FFFFFF",
   },
   actionText: {
-    fontSize: 14,
-    color: "#064E3B",
-    fontWeight: "600",
+    fontSize: 16,
+    color: "#1F2937",
+    fontWeight: "400",
     flex: 1,
-    lineHeight: 20,
+    lineHeight: 24,
   },
   statusCard: {
     backgroundColor: "#FFFFFF",
-    marginHorizontal: 16,
+    marginHorizontal: 20,
     borderRadius: 12,
-    padding: 16,
-    gap: 14,
-    marginBottom: 16,
+    padding: 20,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
   },
   contactsCard: {
     backgroundColor: "#FFFFFF",
-    marginHorizontal: 16,
+    marginHorizontal: 20,
     borderRadius: 12,
-    padding: 16,
-    gap: 12,
-    marginBottom: 16,
+    padding: 20,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
   },
   cardTitle: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: "#DC2626",
-    marginBottom: 4,
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#111827",
+    marginBottom: 16,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: "#E5E7EB",
+    marginBottom: 16,
   },
   statusItem: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap: 12,
+    marginBottom: 16,
+  },
+  statusIconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "#F3F4F6",
+    justifyContent: "center",
+    alignItems: "center",
   },
   statusIcon: {
     fontSize: 18,
-    width: 24,
   },
   statusTextContainer: {
     flex: 1,
   },
   statusTitle: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: "#1F2937",
+    fontSize: 15,
+    fontWeight: "500",
+    color: "#111827",
+    marginBottom: 2,
   },
   statusSubtitle: {
-    fontSize: 12,
+    fontSize: 13,
     color: "#6B7280",
-    fontWeight: "500",
-  },
-  helpButton: {
-    backgroundColor: "#10B981",
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: "center",
-    marginTop: 8,
-  },
-  helpButtonText: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: "#FFFFFF",
+    fontWeight: "400",
   },
   contactButton: {
-    paddingVertical: 14,
-    borderRadius: 8,
+    backgroundColor: "#DC2626",
+    paddingVertical: 16,
+    borderRadius: 10,
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "center",
-    gap: 8,
-  },
-  contactButtonGreen: {
-    backgroundColor: "#10B981",
-  },
-  contactButtonBlue: {
-    backgroundColor: "#2563EB",
-  },
-  contactButtonRed: {
-    backgroundColor: "#DC2626",
+    gap: 10,
+    marginBottom: 12,
   },
   contactButtonIcon: {
-    fontSize: 16,
+    fontSize: 18,
   },
   contactButtonText: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: 16,
+    fontWeight: "600",
     color: "#FFFFFF",
   },
-  bottomPadding: {
-    height: 20,
+  exitButton: {
+    backgroundColor: "#10B981",
+    marginHorizontal: 20,
+    paddingVertical: 18,
+    borderRadius: 12,
+    alignItems: "center",
   },
-
-  exitContainer: {
-  marginTop: 24,
-  paddingHorizontal: 16,
-},
-
-exitButton: {
-  backgroundColor: "#10B981", // calming green
-  paddingVertical: 16,
-  borderRadius: 14,
-  alignItems: "center",
-},
-
-exitButtonText: {
-  color: "#FFFFFF",
-  fontSize: 16,
-  fontWeight: "700",
-},
-
+  exitButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  bottomPadding: {
+    height: 40,
+  },
 });

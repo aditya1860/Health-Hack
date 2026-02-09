@@ -12,6 +12,7 @@ import OverviewCards from './OverviewCards';
 import PatientList from './PatientList';
 import Analytics from './analytics';
 import Emergencies from './emergencies';
+import CommonBackButton from "../../components/CommonBackButton";
 
 const DoctorDashboard = () => {
   const [activeTab, setActiveTab] = useState('Patient List');
@@ -66,6 +67,8 @@ const DoctorDashboard = () => {
             </TouchableOpacity>
           ))}
         </View>
+
+        <CommonBackButton color="#F9FAFB" />
 
         {/* Content */}
         {renderContent()}
