@@ -48,10 +48,11 @@ export default function DoctorLogin() {
     }
 
     const user = await findUserByPhone(phone, 'doctor');
-    if (!user) {
-      Alert.alert('Doctor not registered', 'Please sign up first');
-      return;
-    }
+    const sessionUser = {
+    ...user,
+    role: 'doctor',
+  };
+
 
     await setSession(user);
     router.replace('/doctor')
