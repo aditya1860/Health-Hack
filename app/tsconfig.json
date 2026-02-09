@@ -9,6 +9,7 @@
 //   ]
 // }
 {
+<<<<<<< HEAD
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
@@ -26,14 +27,24 @@
       "@/*": ["./app/*"]
     }
   },
+=======
+>>>>>>> 8eb54539a0a010a8b650c1e5f5cf18613d560379
   "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "skipLibCheck": true
+  },
   "include": [
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
   ],
+<<<<<<< HEAD
   "exclude": [
     "node_modules"
   ]
 }
+=======
+  "exclude": ["node_modules"]
+}
+>>>>>>> 8eb54539a0a010a8b650c1e5f5cf18613d560379
