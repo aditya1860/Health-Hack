@@ -33,9 +33,6 @@ export default function PatientDashboard() {
   useEffect(() => {
     const init = async () => {
       if (roleLoading) return;
-
-
-      if (!isMounted) return;
       setLoading(false);
     };
     init();
