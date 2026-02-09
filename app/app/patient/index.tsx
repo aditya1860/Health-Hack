@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import { router, Href, useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getSession, logout } from "../../utils/storage";
-import { useEmergency } from "../context/EmergencyContext";
+import { useEmergency } from "../../context/EmergencyContext";
 
 export default function PatientDashboard() {
   const routerLocal = useRouter();

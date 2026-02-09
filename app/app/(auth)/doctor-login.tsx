@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { findUserByPhone, setSession } from '../../utils/storage';
-import { useEmergency } from "../context/EmergencyContext";
+import { useEmergency } from "../../context/EmergencyContext";
 import { Keyboard , TouchableWithoutFeedback ,   KeyboardAvoidingView, ScrollView} from "react-native";
 
 

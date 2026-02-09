@@ -1,6 +1,6 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { router } from "expo-router";
-import { useEmergency } from "../context/EmergencyContext";
+import { useEmergency } from "../../context/EmergencyContext";
 
 export default function RoleSelect() {
   const { setRole } = useEmergency();
