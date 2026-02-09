@@ -1,7 +1,4 @@
-// app/utils/riskEngine.ts
-
 export type RiskLevel = "Low" | "Medium" | "High";
-
 export interface CheckInData {
   fever: boolean;
   chestPain: boolean;

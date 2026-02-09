@@ -1,185 +1,146 @@
-import { View, Text, StyleSheet, Pressable } from "react-native";
-import { useRouter } from "expo-router";
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  SafeAreaView,
+  StatusBar,
+} from 'react-native';
+import OverviewCards from './OverviewCards';
+import PatientList from './PatientList';
+import Analytics from './analytics';
+import Emergencies from './emergencies';
 
-export default function DoctorDashboard() {
-  const router = useRouter();
+const DoctorDashboard = () => {
+  const [activeTab, setActiveTab] = useState('Patient List');
+
+  const tabs = ['Patient List', 'Recent Alerts', 'Risk Trends'];
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'Patient List':
+        return <PatientList />;
+      case 'Recent Alerts':
+        return <Emergencies />;
+      case 'Risk Trends':
+        return <Analytics />;
+      default:
+        return <PatientList />;
+    }
+  };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Doctor Dashboard</Text>
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      
+      {/* Header */}
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.title}>CareFast</Text>
+          <Text style={styles.subtitle}>Good Overview</Text>
+        </View>
+        <View style={styles.doctorInfo}>
+          <Text style={styles.doctorName}>Dr. Sarah Smith</Text>
+          <Text style={styles.doctorSpecialty}>Clinical Physician</Text>
+        </View>
+      </View>
 
-      <Pressable
-        onPress={() => router.push("/doctor/patients")}
-        style={({ hovered }) => [
-        styles.card,
-        hovered && styles.cardHover,
-        ]}
-      >
-      {({ hovered }) => (
-      <>
-      <Text
-        style={[
-          styles.cardTitle,
-          hovered && styles.cardTitleHover
-        ]}
-      >
-        Patients
-      </Text>
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Overview Cards */}
+        <OverviewCards />
 
-      <Text
-        style={[
-          styles.cardSub,
-          hovered && styles.cardSubHover
-        ]}
-      >
-        View and manage patients
-      </Text>
-    </>
-  )}
-</Pressable>
+        {/* Tabs */}
+        <View style={styles.tabContainer}>
+          {tabs.map((tab) => (
+            <TouchableOpacity
+              key={tab}
+              style={[styles.tab, activeTab === tab && styles.activeTab]}
+              onPress={() => setActiveTab(tab)}
+            >
+              <Text
+                style={[styles.tabText, activeTab === tab && styles.activeTabText]}
+              >
+                {tab}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
 
-
-      <Pressable
-  onPress={() => router.push("/doctor/appointments")}
-  style={({ hovered }) => [
-    styles.card,
-    hovered && styles.cardHover,
-  ]}
->
-  {({ hovered }) => (
-    <>
-      <Text
-        style={[
-          styles.cardTitle,
-          hovered && styles.cardTitleHover,
-        ]}
-      >
-        Appointments
-      </Text>
-
-      <Text
-        style={[
-          styles.cardSub,
-          hovered && styles.cardSubHover,
-        ]}
-      >
-        Upcoming consultations
-      </Text>
-    </>
-  )}
-</Pressable>
-
-
-      <Pressable
-  onPress={() => router.push("/doctor/emergencies")}
-  style={({ hovered }) => [
-    styles.card,
-    hovered && styles.dangerHover,
-  ]}
->
-  {({ hovered }) => (
-    <>
-      <Text
-        style={[
-          styles.dangerTitle,
-          hovered && styles.dangerTitleHover,
-        ]}
-      >
-        Emergencies
-      </Text>
-
-      <Text style={styles.cardSub}>
-        Emergency history & alerts
-      </Text>
-    </>
-  )}
-</Pressable>
-<Pressable
-  onPress={() => router.push("/doctor/analytics")}
-  style={({ hovered }) => [
-    styles.card,
-    hovered && styles.cardHover,
-  ]}
->
-  {({ hovered }) => (
-    <>
-      <Text
-        style={[
-          styles.cardTitle,
-          hovered && styles.cardTitleHover,
-        ]}
-      >
-        Analytics
-      </Text>
-
-      <Text
-        style={[
-          styles.cardSub,
-          hovered && styles.cardSubHover,
-        ]}
-      >
-        Patient risk overview
-      </Text>
-    </>
-  )}
-</Pressable>
-
-    </View>
+        {/* Content */}
+        {renderContent()}
+      </ScrollView>
+    </SafeAreaView>
   );
-}
-const PRIMARY = "#2563EB";
-const PRIMARY_LIGHT = "#EEF2FF";
-const PRIMARY_TEXT_HOVER = "#1D4ED8"; 
+};
+
 const styles = StyleSheet.create({
   container: {
-    padding: 24,
-    backgroundColor: "#F1F5F9",
-    minHeight: "100%",
+    flex: 1,
+    backgroundColor: '#F8F9FA',
+  },
+  header: {
+    backgroundColor: '#fff',
+    padding: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
   },
   title: {
-    fontSize: 26,
-    fontWeight: "700",
-    marginBottom: 24,
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#1F2937',
   },
-  card: {
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1.5,
-    borderColor: PRIMARY,
-    borderRadius: 14,
-    padding: 18,
-    marginBottom: 16,
-    cursor: "pointer",
+  subtitle: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginTop: 2,
   },
-  cardHover: {
-    backgroundColor: PRIMARY_LIGHT,
+  doctorInfo: {
+    alignItems: 'flex-end',
   },
-  dangerHover: {
-    backgroundColor: "#FEF2F2",
-    borderColor: "#DC2626",
+  doctorName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1F2937',
   },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: PRIMARY,
-  },cardTitleHover: {
-    color: PRIMARY_TEXT_HOVER,
+  doctorSpecialty: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginTop: 2,
   },
-
-  cardSub: {
-    marginTop: 6,
-    color: "#475569",
+  content: {
+    flex: 1,
   },
-
-  cardSubHover: {
-    color: "#1E40AF",
+  tabContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    marginHorizontal: 16,
+    marginTop: 16,
+    borderRadius: 8,
+    padding: 4,
   },
-  dangerTitle: {
-  fontSize: 18,
-  fontWeight: "600",
-  color: "#DC2626",
-},
-dangerTitleHover: {
-  color: "#991B1B",
-},
+  tab: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: 'center',
+    borderRadius: 6,
+  },
+  activeTab: {
+    backgroundColor: '#3B82F6',
+  },
+  tabText: {
+    fontSize: 13,
+    color: '#6B7280',
+    fontWeight: '500',
+  },
+  activeTabText: {
+    color: '#fff',
+    fontWeight: '600',
+  },
 });
 
+export default DoctorDashboard;

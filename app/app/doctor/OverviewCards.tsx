@@ -1,50 +1,64 @@
-import { View, Text, StyleSheet } from "react-native";
-import { patients } from "./mockData";
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { overviewStats } from './mockData';
 
-export default function OverviewCards() {
-  const total = patients.length;
-  const highRisk = patients.filter(p => p.risk === "HIGH").length;
-  const emergencies = patients.filter(p => p.emergencies.length > 0).length;
+const OverviewCards = () => {
+  const cards = [
+    {
+      label: 'Total Patients',
+      value: overviewStats.totalPatients,
+      color: '#3B82F6',
+    },
+    {
+      label: 'Active Monitoring',
+      value: overviewStats.activeMonitoring,
+      color: '#10B981',
+    },
+    {
+      label: 'Total Incidents',
+      value: overviewStats.totalIncidents,
+      color: '#EF4444',
+    },
+  ];
 
   return (
-    <View style={styles.row}>
-      <Card title="Patients" value={total} />
-      <Card title="High Risk" value={highRisk} color="#DC2626" />
-      <Card title="Emergencies" value={emergencies} color="#B91C1C" />
-    </View>
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={styles.container}
+    >
+      {cards.map((card, index) => (
+        <View key={index} style={[styles.card, { borderColor: card.color }]}>
+          <Text style={styles.value}>{card.value}</Text>
+          <Text style={styles.label}>{card.label}</Text>
+        </View>
+      ))}
+    </ScrollView>
   );
-}
+};
 
-function Card({ title, value, color = "#2563EB" }) {
-  return (
-    <View style={[styles.card, { borderColor: color }]}>
-      <Text style={styles.value}>{value}</Text>
-      <Text style={styles.title}>{title}</Text>
-    </View>
-  );
-}
+export default OverviewCards;
 
 const styles = StyleSheet.create({
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 16
+  container: {
+    paddingHorizontal: 16,
   },
   card: {
-    flex: 1,
-    marginHorizontal: 4,
-    padding: 12,
-    borderWidth: 2,
+    backgroundColor: '#fff',
     borderRadius: 12,
-    backgroundColor: "#F9FAFB",
-    alignItems: "center"
+    padding: 16,
+    marginRight: 12,
+    minWidth: 140,
+    borderWidth: 1,
   },
   value: {
-    fontSize: 20,
-    fontWeight: "bold"
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#111827',
   },
-  title: {
-    fontSize: 12,
-    color: "#6B7280"
-  }
+  label: {
+    fontSize: 13,
+    color: '#6B7280',
+    marginTop: 4,
+  },
 });
