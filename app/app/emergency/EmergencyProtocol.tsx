@@ -1,6 +1,7 @@
-import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
+import { View, Text, StyleSheet, Pressable, ScrollView, Alert } from "react-native";
 import { useState, useEffect } from "react";
 import { EmergencyKey } from "./emergencyGuide";
+
 
 interface EmergencyProtocolProps {
   emergencyType: EmergencyKey;
@@ -245,7 +246,7 @@ export default function EmergencyProtocol({ emergencyType, onBack }: EmergencyPr
             <Text style={styles.statusIcon}>📍</Text>
             <View style={styles.statusTextContainer}>
               <Text style={styles.statusTitle}>Location Shared</Text>
-              <Text style={styles.statusSubtitle}>123 Main St, Mumbai</Text>
+              <Text style={styles.statusSubtitle}>Noida , Uttar Pradesh</Text>
             </View>
           </View>
           <Pressable style={styles.helpButton}>
@@ -258,17 +259,40 @@ export default function EmergencyProtocol({ emergencyType, onBack }: EmergencyPr
           <Text style={styles.cardTitle}>Emergency Contacts</Text>
           <Pressable style={[styles.contactButton, styles.contactButtonGreen]}>
             <Text style={styles.contactButtonIcon}>📞</Text>
-            <Text style={styles.contactButtonText}>Call Jane Doe (Spouse)</Text>
+            <Text style={styles.contactButtonText}>Call Dad</Text>
           </Pressable>
           <Pressable style={[styles.contactButton, styles.contactButtonBlue]}>
             <Text style={styles.contactButtonIcon}>📞</Text>
-            <Text style={styles.contactButtonText}>Call Dr. Smith</Text>
+            <Text style={styles.contactButtonText}>Call Dr. Jain</Text>
           </Pressable>
           <Pressable style={[styles.contactButton, styles.contactButtonRed]}>
             <Text style={styles.contactButtonIcon}>📞</Text>
-            <Text style={styles.contactButtonText}>Call 108 (Ambulance)</Text>
+            <Text style={styles.contactButtonText}>Call 112 (Ambulance)</Text>
           </Pressable>
         </View>
+        {/* Exit Emergency */}
+
+
+{onBack && (
+  <View style={styles.exitContainer}>
+    <Pressable
+      style={styles.exitButton}
+      onPress={() => {
+        Alert.alert(
+          "Exit Emergency Mode",
+          "Are you sure you are safe now?",
+          [
+            { text: "Stay in Emergency", style: "cancel" },
+            { text: "Yes, I'm Safe", onPress: onBack },
+          ]
+        );
+      }}
+    >
+      <Text style={styles.exitButtonText}>I feel safe now</Text>
+    </Pressable>
+  </View>
+)}
+
 
         <View style={styles.bottomPadding} />
       </ScrollView>
@@ -519,4 +543,23 @@ const styles = StyleSheet.create({
   bottomPadding: {
     height: 20,
   },
+
+  exitContainer: {
+  marginTop: 24,
+  paddingHorizontal: 16,
+},
+
+exitButton: {
+  backgroundColor: "#10B981", // calming green
+  paddingVertical: 16,
+  borderRadius: 14,
+  alignItems: "center",
+},
+
+exitButtonText: {
+  color: "#FFFFFF",
+  fontSize: 16,
+  fontWeight: "700",
+},
+
 });
