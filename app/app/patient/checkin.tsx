@@ -7,134 +7,176 @@ import {
   ScrollView,
 } from "react-native";
 import { useState } from "react";
-import { useRouter } from "expo-router";
+import SymptomCheckbox from "./components/SymptomCheckbox";
 
 export default function CheckIn() {
-  const router = useRouter();
+  const [bp, setBp] = useState("");
+  const [hr, setHr] = useState("");
+  const [sugar, setSugar] = useState("");
+  const [missedMeds, setMissedMeds] = useState(false);
 
-  const [answers, setAnswers] = useState({
-    sugar: "",
-    heartRate: "",
-    bloodPressure: "",
-    oxygen: "",
-    feeling: "",
-  });
+  const [symptoms, setSymptoms] = useState<string[]>([]);
 
-  const handleSubmit = () => {
-    router.push({
-      pathname: "./result",
-      params: answers,
-    });
+  const toggleSymptom = (symptom: string) => {
+    if (symptoms.includes(symptom)) {
+      setSymptoms(symptoms.filter((s) => s !== symptom));
+    } else {
+      setSymptoms([...symptoms, symptom]);
+    }
+  };
+
+  const calculateRisk = () => {
+    alert("Risk calculated (Demo)");
   };
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>Daily Health Check-in</Text>
-      <Text style={styles.subtitle}>
-        Please enter today’s health readings
+
+      {/* TITLE */}
+      <Text style={styles.title}>
+        Daily Health Check-In
       </Text>
 
-      {/* Blood Sugar */}
-      <Text style={styles.label}>Blood Sugar (mg/dL)</Text>
-      <TextInput
-        style={styles.input}
-        keyboardType="numeric"
-        placeholder="e.g. 110"
-        onChangeText={(text) =>
-          setAnswers({ ...answers, sugar: text })
-        }
+      <Text style={styles.subtitle}>
+        Answer these questions to assess your current health risk level
+      </Text>
+
+      {/* VITAL SIGNS */}
+      <Text style={styles.section}>
+        Vital Signs
+      </Text>
+
+      <View style={styles.vitalsRow}>
+        <TextInput
+          style={styles.input}
+          placeholder="BP e.g. 120/80"
+          value={bp}
+          onChangeText={setBp}
+        />
+
+        <TextInput
+          style={styles.input}
+          placeholder="Heart Rate e.g. 72"
+          value={hr}
+          onChangeText={setHr}
+        />
+
+        <TextInput
+          style={styles.input}
+          placeholder="Sugar e.g. 100"
+          value={sugar}
+          onChangeText={setSugar}
+        />
+      </View>
+
+      {/* MEDICINE */}
+      <Text style={styles.section}>
+        Medicine Adherence
+      </Text>
+
+      <SymptomCheckbox
+        label="I missed taking my prescribed medicines today"
+        selected={missedMeds}
+        onPress={() => setMissedMeds(!missedMeds)}
       />
 
-      {/* Heart Rate */}
-      <Text style={styles.label}>Heart Rate (BPM)</Text>
-      <TextInput
-        style={styles.input}
-        keyboardType="numeric"
-        placeholder="e.g. 72"
-        onChangeText={(text) =>
-          setAnswers({ ...answers, heartRate: text })
-        }
-      />
+      {/* SYMPTOMS */}
+      <Text style={styles.section}>
+        Symptoms (Select all that apply)
+      </Text>
 
-      {/* Blood Pressure */}
-      <Text style={styles.label}>Blood Pressure</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="e.g. 120/80"
-        onChangeText={(text) =>
-          setAnswers({ ...answers, bloodPressure: text })
-        }
-      />
+      <View style={styles.symptomGrid}>
 
-      {/* Oxygen */}
-      <Text style={styles.label}>Oxygen Level (SpO₂ %)</Text>
-      <TextInput
-        style={styles.input}
-        keyboardType="numeric"
-        placeholder="e.g. 98"
-        onChangeText={(text) =>
-          setAnswers({ ...answers, oxygen: text })
-        }
-      />
+        {[
+          "Dizziness",
+          "Shortness of Breath",
+          "Nausea",
+          "Severe Headache",
+          "Chest Pain",
+          "Unusual Fatigue",
+          "Confusion",
+          "Numbness",
+        ].map((symptom) => (
+          <SymptomCheckbox
+            key={symptom}
+            label={symptom}
+            selected={symptoms.includes(symptom)}
+            onPress={() => toggleSymptom(symptom)}
+          />
+        ))}
 
-      {/* Feeling */}
-      <Text style={styles.label}>How are you feeling?</Text>
-      <TextInput
-        style={[styles.input, { height: 80 }]}
-        multiline
-        placeholder="Describe symptoms if any..."
-        onChangeText={(text) =>
-          setAnswers({ ...answers, feeling: text })
-        }
-      />
+      </View>
 
-      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Submit Check-in</Text>
+      {/* BUTTON */}
+      <TouchableOpacity
+        style={styles.button}
+        onPress={calculateRisk}
+      >
+        <Text style={styles.buttonText}>
+          Calculate Risk Level
+        </Text>
       </TouchableOpacity>
+
     </ScrollView>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#F3F4F6",
     padding: 20,
   },
+
   title: {
-    fontSize: 26,
+    fontSize: 22,
     fontWeight: "bold",
-    marginBottom: 6,
+    marginBottom: 4,
   },
+
   subtitle: {
-    fontSize: 16,
-    marginBottom: 20,
     color: "#6B7280",
+    marginBottom: 20,
   },
-  label: {
+
+  section: {
     fontSize: 16,
     fontWeight: "600",
-    marginBottom: 6,
+    marginBottom: 12,
+    marginTop: 10,
   },
+
+  vitalsRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 20,
+  },
+
   input: {
-    borderWidth: 1,
-    borderColor: "#D1D5DB",
+    backgroundColor: "#FFFFFF",
     padding: 14,
     borderRadius: 10,
-    marginBottom: 16,
-    fontSize: 16,
+    width: "32%",
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
   },
+
+  symptomGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+  },
+
   button: {
     backgroundColor: "#2563EB",
     padding: 16,
-    borderRadius: 12,
-    marginTop: 10,
+    borderRadius: 10,
+    marginTop: 20,
+    marginBottom: 40,
   },
+
   buttonText: {
     color: "#FFFFFF",
     textAlign: "center",
     fontWeight: "bold",
-    fontSize: 16,
   },
 });
-   
