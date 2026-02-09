@@ -3,6 +3,7 @@ import { router, useRootNavigationState } from "expo-router";
 import { useEmergency } from "./context/EmergencyContext";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getSession } from "../utils/storage";
 
 
 export default function Index() {
@@ -23,24 +24,33 @@ useEffect(() => {
 }, []);
 
 
-  useEffect(() => {
+useEffect(() => {
+  const resolveRoute = async () => {
     if (!navState?.key) return;
     if (onboardingLoading || emergencyLoading) return;
     if (onboardingDone === null) return;
-    
-    if (!onboardingDone) {
-    router.replace("/onboarding");
-    return;
-  }
 
-    if (!role) {
+    if (!onboardingDone) {
+      router.replace("/onboarding");
+      return;
+    }
+
+    const session = await getSession();
+
+    if (!session) {
       router.replace("/role-select");
-    } else if (role === "doctor") {
+      return;
+    }
+
+    if (session.role === "doctor") {
       router.replace("/doctor");
     } else {
       router.replace("/patient");
     }
-  }, [navState, onboardingLoading, emergencyLoading,onboardingDone, role]);
+  };
+
+  resolveRoute();
+}, [navState, onboardingLoading, emergencyLoading, onboardingDone]);
 
 if (onboardingLoading || emergencyLoading) {
   return (

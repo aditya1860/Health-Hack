@@ -11,6 +11,7 @@ import {
 
 import { router } from 'expo-router';
 import { addUser, setSession } from '../../utils/storage';
+import { Keyboard , TouchableWithoutFeedback ,   KeyboardAvoidingView, ScrollView} from "react-native";
 
 const OTP = '1234';
 
@@ -25,181 +26,6 @@ const SPECIALIZATIONS = [
 ];
 
 const EXPERIENCE = ['0–1', '2–5', '5–10', '10+'];
-
-export default function DoctorSignup() {
-  const [isVerified, setIsVerified] = useState(false);
-
-  const [phone, setPhone] = useState('');
-  const [otp, setOtp] = useState('');
-
-  const [name, setName] = useState('');
-  const [specialization, setSpecialization] = useState('');
-  const [experience, setExperience] = useState('');
-  const [clinic, setClinic] = useState('');
-
-  // ✅ SEND OTP (popup only)
-  const sendOtp = () => {
-  if (phone.length !== 10) {
-    if (Platform.OS === 'web') {
-      window.alert('Invalid phone number');
-    } else {
-      Alert.alert('Invalid phone number');
-    }
-    return;
-  }
-
-  const message = 'Your OTP is 1234 (demo purpose)';
-
-  if (Platform.OS === 'web') {
-    window.alert(message);
-  } else {
-    Alert.alert('OTP Sent', message);
-  }
-};
-
-
-  // ✅ VERIFY OTP
-  const verifyOtp = () => {
-    if (otp !== OTP) {
-      Alert.alert('Invalid OTP');
-      return;
-    }
-
-    setIsVerified(true);
-  };
-
-  const handleSignup = async () => {
-    if (!name || !specialization || !experience) {
-      Alert.alert('Fill all required fields');
-      return;
-    }
-
-    const doctor = {
-      role: 'doctor',
-      phone,
-      name,
-      specialization,
-      experience,
-      clinic,
-    };
-
-    await addUser(doctor);
-    await setSession(doctor);
-
-    router.replace('/doctor');
-  };
-
-  return (
-    <View style={styles.container}>
-      <View style={styles.card}>
-        <Text style={styles.title}>Doctor Signup</Text>
-
-        {/* Phone + OTP */}
-        <TextInput
-          placeholder="+91 Mobile Number"
-          keyboardType="number-pad"
-          value={phone}
-          editable={!isVerified}
-          onChangeText={setPhone}
-          style={styles.input}
-        />
-
-        <TextInput
-          placeholder="Enter OTP"
-          keyboardType="number-pad"
-          value={otp}
-          onChangeText={setOtp}
-          style={styles.input}
-        />
-
-        {!isVerified && (
-          <>
-            <Pressable style={styles.btn} onPress={sendOtp}>
-              <Text style={styles.btnText}>Send OTP</Text>
-            </Pressable>
-
-            <Pressable style={styles.btn} onPress={verifyOtp}>
-              <Text style={styles.btnText}>Verify OTP</Text>
-            </Pressable>
-          </>
-        )}
-
-        {/* 👇 DOCTOR DETAILS APPEAR HERE */}
-        {isVerified && (
-          <>
-            <View style={styles.divider} />
-
-            <Text style={styles.sectionTitle}>Doctor Details</Text>
-
-            <TextInput
-              placeholder="Doctor Full Name (e.g. Dr. Anil Sharma)"
-              value={name}
-              onChangeText={setName}
-              style={styles.input}
-            />
-
-            <Text style={styles.label}>Specialization</Text>
-            <View style={styles.optionGrid}>
-              {SPECIALIZATIONS.map((item) => (
-                <Pressable
-                  key={item}
-                  onPress={() => setSpecialization(item)}
-                  style={[
-                    styles.pill,
-                    specialization === item && styles.pillActive,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.pillText,
-                      specialization === item && styles.pillTextActive,
-                    ]}
-                  >
-                    {item}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
-
-            <Text style={styles.label}>Experience</Text>
-            <View style={styles.optionGrid}>
-              {EXPERIENCE.map((item) => (
-                <Pressable
-                  key={item}
-                  onPress={() => setExperience(item)}
-                  style={[
-                    styles.pill,
-                    experience === item && styles.pillActive,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.pillText,
-                      experience === item && styles.pillTextActive,
-                    ]}
-                  >
-                    {item} yrs
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
-
-            <TextInput
-              placeholder="Clinic / Hospital Name (optional)"
-              value={clinic}
-              onChangeText={setClinic}
-              style={styles.input}
-            />
-
-            <Pressable style={styles.btn} onPress={handleSignup}>
-              <Text style={styles.btnText}>Create Account</Text>
-            </Pressable>
-          </>
-        )}
-      </View>
-    </View>
-  );
-}
 
 const styles = StyleSheet.create({
   container: {
@@ -289,3 +115,187 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
+
+export default function DoctorSignup() {
+
+  
+  const [isVerified, setIsVerified] = useState(false);
+
+  const [phone, setPhone] = useState('');
+  const [otp, setOtp] = useState('');
+
+  const [name, setName] = useState('');
+  const [specialization, setSpecialization] = useState('');
+  const [experience, setExperience] = useState('');
+  const [clinic, setClinic] = useState('');
+
+  // ✅ SEND OTP (popup only)
+  const sendOtp = () => {
+  if (phone.length !== 10) {
+    if (Platform.OS === 'web') {
+      window.alert('Invalid phone number');
+    } else {
+      Alert.alert('Invalid phone number');
+    }
+    return;
+  }
+
+  const message = 'Your OTP is 1234 (demo purpose)';
+
+  if (Platform.OS === 'web') {
+    window.alert(message);
+  } else {
+    Alert.alert('OTP Sent', message);
+  }
+};
+
+
+  // ✅ VERIFY OTP
+  const verifyOtp = () => {
+    if (otp !== OTP) {
+      Alert.alert('Invalid OTP');
+      return;
+    }
+
+    setIsVerified(true);
+  };
+
+  const handleSignup = async () => {
+    if (!name || !specialization || !experience) {
+      Alert.alert('Fill all required fields');
+      return;
+    }
+
+    const doctor = {
+      role: 'doctor',
+      phone,
+      name,
+      specialization,
+      experience,
+      clinic,
+    };
+
+    await addUser(doctor);
+    await setSession(doctor);
+
+    router.replace('/doctor');
+  };
+
+  return (
+   <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+      >
+        <ScrollView
+          contentContainerStyle={styles.container}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.card}>
+            <Text style={styles.title}>Doctor Signup</Text>
+
+            <TextInput
+              placeholder="+91 Mobile Number"
+              keyboardType="number-pad"
+              value={phone}
+              editable={!isVerified}
+              onChangeText={(t) => setPhone(t.replace(/[^0-9]/g, ""))}
+              style={styles.input}
+            />
+
+            <TextInput
+              placeholder="Enter OTP"
+              keyboardType="number-pad"
+              value={otp}
+              onChangeText={setOtp}
+              style={styles.input}
+            />
+
+            {!isVerified && (
+              <>
+                <Pressable style={styles.btn} onPress={sendOtp}>
+                  <Text style={styles.btnText}>Send OTP</Text>
+                </Pressable>
+                <Pressable style={styles.btn} onPress={verifyOtp}>
+                  <Text style={styles.btnText}>Verify OTP</Text>
+                </Pressable>
+              </>
+            )}
+
+            {isVerified && (
+              <>
+                <View style={styles.divider} />
+
+                <Text style={styles.sectionTitle}>Doctor Details</Text>
+
+                <TextInput
+                  placeholder="Doctor Full Name"
+                  value={name}
+                  onChangeText={setName}
+                  style={styles.input}
+                />
+
+                <Text style={styles.label}>Specialization</Text>
+                <View style={styles.optionGrid}>
+                  {SPECIALIZATIONS.map((item) => (
+                    <Pressable
+                      key={item}
+                      onPress={() => setSpecialization(item)}
+                      style={[
+                        styles.pill,
+                        specialization === item && styles.pillActive,
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.pillText,
+                          specialization === item && styles.pillTextActive,
+                        ]}
+                      >
+                        {item}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
+
+                <Text style={styles.label}>Experience</Text>
+                <View style={styles.optionGrid}>
+                  {EXPERIENCE.map((item) => (
+                    <Pressable
+                      key={item}
+                      onPress={() => setExperience(item)}
+                      style={[
+                        styles.pill,
+                        experience === item && styles.pillActive,
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.pillText,
+                          experience === item && styles.pillTextActive,
+                        ]}
+                      >
+                        {item} yrs
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
+
+                <TextInput
+                  placeholder="Clinic / Hospital Name (optional)"
+                  value={clinic}
+                  onChangeText={setClinic}
+                  style={styles.input}
+                />
+
+                <Pressable style={styles.btn} onPress={handleSignup}>
+                  <Text style={styles.btnText}>Create Account</Text>
+                </Pressable>
+              </>
+            )}
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
+  );
+}
