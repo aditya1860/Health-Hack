@@ -198,6 +198,7 @@ export default function DoctorSignup() {
               placeholder="+91 Mobile Number"
               keyboardType="number-pad"
               value={phone}
+              placeholderTextColor="#9CA3AF"
               editable={!isVerified}
               onChangeText={(t) => setPhone(t.replace(/[^0-9]/g, ""))}
               style={styles.input}
@@ -206,6 +207,7 @@ export default function DoctorSignup() {
             <TextInput
               placeholder="Enter OTP"
               keyboardType="number-pad"
+              placeholderTextColor="#9CA3AF"
               value={otp}
               onChangeText={setOtp}
               style={styles.input}
@@ -230,6 +232,7 @@ export default function DoctorSignup() {
 
                 <TextInput
                   placeholder="Doctor Full Name"
+                  placeholderTextColor="#9CA3AF"
                   value={name}
                   onChangeText={setName}
                   style={styles.input}
@@ -283,6 +286,7 @@ export default function DoctorSignup() {
 
                 <TextInput
                   placeholder="Clinic / Hospital Name (optional)"
+                  placeholderTextColor="#9CA3AF"
                   value={clinic}
                   onChangeText={setClinic}
                   style={styles.input}

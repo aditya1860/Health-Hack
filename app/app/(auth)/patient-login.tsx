@@ -11,6 +11,7 @@ import {
 import { router } from 'expo-router';
 import { findUserByPhone, setSession } from '../../utils/storage';
 import { useEmergency } from '../context/EmergencyContext';
+import { Keyboard , TouchableWithoutFeedback ,   KeyboardAvoidingView, ScrollView} from "react-native";
 
 const OTP = '1234';
 
@@ -63,55 +64,7 @@ export default function PatientLogin() {
     router.replace('/patient');  // ✅ redirect works
   };
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.card}>
-        <Text style={styles.title}>Patient Login</Text>
-        <Text style={styles.subtitle}>
-          We’ll send a one-time password to your phone
-        </Text>
-
-        {step === 1 && (
-          <>
-            <TextInput
-              placeholder="+91 Mobile Number"
-              keyboardType="number-pad"
-              value={phone}
-              onChangeText={setPhone}
-              style={styles.input}
-            />
-            <Pressable style={styles.btn} onPress={sendOtp}>
-              <Text style={styles.btnText}>Send OTP</Text>
-            </Pressable>
-          </>
-        )}
-
-        {step === 2 && (
-          <>
-            <TextInput
-              placeholder="Enter OTP"
-              keyboardType="number-pad"
-              value={otp}
-              onChangeText={setOtp}
-              style={styles.input}
-            />
-            <Pressable style={styles.btn} onPress={() => router.replace('/emergency')}> 
-              {/* Replace with Patient Dashboard  */}
-              <Text style={styles.btnText}>Verify & Login</Text>
-            </Pressable>
-          </>
-        )}
-
-        <Pressable onPress={() => router.replace('/patient-signup')}>
-          <Text style={styles.link}>
-            New user? <Text style={styles.linkBold}>Create account</Text>
-          </Text>
-        </Pressable>
-      </View>
-    </View>
-  );
-}
-
+  
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -174,3 +127,67 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
+
+
+return (
+  <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+    >
+      <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.card}>
+          <Text style={styles.title}>Patient Login</Text>
+          <Text style={styles.subtitle}>
+            We’ll send a one-time password to your phone
+          </Text>
+
+          {step === 1 && (
+            <>
+              <TextInput
+                placeholder="+91 Mobile Number"
+                placeholderTextColor="#9CA3AF"
+                keyboardType="number-pad"
+                value={phone}
+                onChangeText={(t) => setPhone(t.replace(/[^0-9]/g, ""))}
+                style={styles.input}
+              />
+              <Pressable style={styles.btn} onPress={sendOtp}>
+                <Text style={styles.btnText}>Send OTP</Text>
+              </Pressable>
+            </>
+          )}
+
+          {step === 2 && (
+            <>
+              <TextInput
+                placeholder="Enter OTP"
+                placeholderTextColor="#9CA3AF"
+                keyboardType="number-pad"
+                value={otp}
+                onChangeText={setOtp}
+                style={styles.input}
+              />
+              <Pressable
+                style={styles.btn}
+                onPress={() => router.replace("/emergency")}
+              >
+                <Text style={styles.btnText}>Verify & Login</Text>
+              </Pressable>
+            </>
+          )}
+
+          <Pressable onPress={() => router.replace("/patient-signup")}>
+            <Text style={styles.link}>
+              New user? <Text style={styles.linkBold}>Create account</Text>
+            </Text>
+          </Pressable>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
+  </TouchableWithoutFeedback>
+);
+}

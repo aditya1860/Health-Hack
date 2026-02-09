@@ -181,6 +181,7 @@ Keyboard.dismiss();
               <TextInput
                 placeholder="+91 Mobile Number"
                 keyboardType="number-pad"
+                placeholderTextColor="#9CA3AF"
                 value={phone}
                 onChangeText={(t) => setPhone(t.replace(/[^0-9]/g, ""))}
                 style={styles.input}
@@ -196,6 +197,8 @@ Keyboard.dismiss();
               <TextInput
                 placeholder="Enter OTP"
                 keyboardType="number-pad"
+                placeholderTextColor="#9CA3AF"
+
                 value={otp}
                 onChangeText={setOtp}
                 style={styles.input}
