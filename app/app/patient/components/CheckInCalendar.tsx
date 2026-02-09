@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet } from "react-native";
 import { useEffect, useState } from "react";
+import { getSession } from "../../../utils/storage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function CheckInCalendar() {
@@ -9,22 +10,36 @@ export default function CheckInCalendar() {
     loadCheckIns();
   }, []);
 
-  const loadCheckIns = async () => {
-    try {
-      const historyData = await AsyncStorage.getItem("CHECKIN_HISTORY");
-      if (historyData) {
-        const history = JSON.parse(historyData);
-        // Get dates of check-ins
-        const dates = history.map((item: any) => {
-          const date = new Date(item.timestamp);
-          return date.toISOString().split("T")[0]; // YYYY-MM-DD format
-        });
-        setCheckIns(dates);
-      }
-    } catch (error) {
-      console.error("Error loading check-ins:", error);
+const loadCheckIns = async () => {
+  try {
+    const session = await getSession();
+    if (!session || !session.phone) {
+      setCheckIns([]);
+      return;
     }
-  };
+
+    const phone = session.phone;
+    const historyKey = `CHECKIN_HISTORY_${phone}`;
+
+    const historyData = await AsyncStorage.getItem(historyKey);
+    if (historyData) {
+      const history = JSON.parse(historyData);
+
+      const dates = history.map((item: any) => {
+        const date = new Date(item.timestamp);
+        return date.toISOString().split("T")[0];
+      });
+
+      setCheckIns(dates);
+    } else {
+      setCheckIns([]);
+    }
+  } catch (error) {
+    console.error("Error loading check-ins:", error);
+    setCheckIns([]);
+  }
+};
+
 
   // Get last 14 days
   const getLast14Days = () => {

@@ -14,6 +14,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import SymptomCheckbox from "./components/SymptomCheckbox";
 import { calculateRisk } from "../../utils/riskEngine";
+import { getSession } from "../../utils/storage";
 
 export default function CheckIn() {
   const router = useRouter();
@@ -73,20 +74,31 @@ export default function CheckIn() {
         riskLevel: risk.level,
       };
 
+      const session = await getSession();
+
+      if (!session) {
+        throw new Error("No active session");
+      }
+
+      const phone = session.phone;
+
       await AsyncStorage.setItem(
-        "LAST_CHECKIN",
+        `LAST_CHECKIN_${phone}`,
         JSON.stringify(checkInRecord)
       );
 
       // Save history
-      const historyKey = "CHECKIN_HISTORY";
-      const historyData = await AsyncStorage.getItem(historyKey);
-      const history = historyData ? JSON.parse(historyData) : [];
-      history.unshift(checkInRecord);
-      await AsyncStorage.setItem(
-        historyKey,
-        JSON.stringify(history.slice(0, 30))
-      );
+    const historyKey = `CHECKIN_HISTORY_${phone}`;
+
+    const historyData = await AsyncStorage.getItem(historyKey);
+    const history = historyData ? JSON.parse(historyData) : [];
+
+    history.unshift(checkInRecord);
+
+    await AsyncStorage.setItem(
+      historyKey,
+      JSON.stringify(history.slice(0, 30))
+    );
 
       setRiskResult(risk);
     } catch (err) {
