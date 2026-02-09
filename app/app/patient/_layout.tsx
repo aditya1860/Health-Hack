@@ -1,28 +1,53 @@
-import { View, StyleSheet } from "react-native";
-import { Slot } from "expo-router";
-import Sidebar from "./components/Sidebar";
+import { Drawer } from "expo-router/drawer";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function Layout() {
   return (
-    <View style={styles.container}>
-      <Sidebar />
+    <Drawer
+      screenOptions={{
+        headerShown: true,
+        drawerActiveTintColor: "#2563EB",
+      }}
+    >
+      <Drawer.Screen
+        name="index"
+        options={{
+          title: "Home",
+          drawerIcon: ({ color, size }) => (
+            <Ionicons name="home" size={size} color={color} />
+          ),
+        }}
+      />
 
-      <View style={styles.content}>
-        <Slot />
-      </View>
-    </View>
+      <Drawer.Screen
+        name="checkin"
+        options={{
+          title: "Checkin",
+          drawerIcon: ({ color, size }) => (
+            <Ionicons name="medkit" size={size} color={color} />
+          ),
+        }}
+      />
+
+      <Drawer.Screen
+        name="alerts"
+        options={{
+          title: "Alerts",
+          drawerIcon: ({ color, size }) => (
+            <Ionicons name="alert-circle" size={size} color={color} />
+          ),
+        }}
+      />
+
+      <Drawer.Screen
+        name="profile"
+        options={{
+          title: "Profile",
+          drawerIcon: ({ color, size }) => (
+            <Ionicons name="person" size={size} color={color} />
+          ),
+        }}
+      />
+    </Drawer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: "row",
-  },
-
-  content: {
-    flex: 1,
-    backgroundColor: "#F3F4F6",
-    padding: 20,
-  },
-});

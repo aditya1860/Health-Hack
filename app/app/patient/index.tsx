@@ -1,3 +1,4 @@
+
 import {
   View,
   Text,
@@ -16,27 +17,20 @@ import StatusCard from "./components/StatusCard";
 import EmergencyCard from "./components/EmergencyCard";
 import { useEmergency } from "../../context/EmergencyContext";
 
-
-import { getSession, logout } from "../../utils/storage";
-
 export default function PatientDashboard() {
   const router = useRouter();
   const { width } = useWindowDimensions();
-  const isMobile = width < 768;
 
-  const { role, loading: roleLoading, setRole } =
-    useEmergency();
+  /* BREAKPOINTS */
+  const isTablet = width >= 768;
+  const isLargeTablet = width >= 1024;
 
+  const { role, loading: roleLoading } = useEmergency();
   const [loading, setLoading] = useState(true);
 
-  /* SESSION CHECK */
   useEffect(() => {
-    const init = async () => {
-      if (roleLoading) return;
-      setLoading(false);
-    };
-    init();
-  }, []);
+    if (!roleLoading) setLoading(false);
+  }, [roleLoading]);
 
   if (loading || roleLoading) {
     return (
@@ -48,30 +42,20 @@ export default function PatientDashboard() {
 
   return (
     <ScrollView style={styles.container}>
-
       <Header />
 
-      {/* MOBILE → Emergency on top */}
-      {isMobile && <EmergencyCard />}
-
+      {/* MAIN WRAPPER */}
       <View
         style={[
-          styles.mainRow,
-          isMobile && { flexDirection: "column" },
+          styles.wrapper,
+          isTablet && styles.wrapperTablet,
         ]}
       >
-
-        {/* WEB → Emergency left */}
-        {!isMobile && <EmergencyCard />}
+        {/* Emergency Card → Top on mobile */}
+        <EmergencyCard />
 
         {/* CONTENT */}
-        <View
-          style={[
-            styles.content,
-            isMobile && { marginLeft: 0 },
-          ]}
-        >
-
+        <View style={styles.content}>
           <Text style={styles.welcome}>
             Welcome to Your Health Dashboard
           </Text>
@@ -80,21 +64,24 @@ export default function PatientDashboard() {
             Monitor your health, track risks and get help
           </Text>
 
+          {/* RESPONSIVE BANNER */}
           <Image
             source={{
               uri: "https://images.unsplash.com/photo-1588776814546-ec7e9b9d55d7",
             }}
-            style={styles.banner}
+            style={[
+              styles.banner,
+              { height: width * 0.4 },
+            ]}
           />
 
           {/* BUTTONS */}
           <View
             style={[
-              styles.btnRow,
-              isMobile && { flexDirection: "column" },
+              styles.btnContainer,
+              isTablet && styles.btnRowTablet,
             ]}
           >
-
             <TouchableOpacity
               style={styles.blueBtn}
               onPress={() =>
@@ -107,10 +94,7 @@ export default function PatientDashboard() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[
-                styles.redBtn,
-                isMobile && { marginTop: 10 },
-              ]}
+              style={styles.redBtn}
               onPress={() =>
                 router.push("/emergency")
               }
@@ -119,17 +103,15 @@ export default function PatientDashboard() {
                 Emergency Help
               </Text>
             </TouchableOpacity>
-
           </View>
- 
+
           {/* STATUS CARDS */}
           <View
             style={[
-              styles.cardRow,
-              isMobile && { flexDirection: "column" },
+              styles.cardContainer,
+              isTablet && styles.cardRowTablet,
             ]}
           >
-
             <StatusCard
               title="Today's Status"
               value="Low Risk"
@@ -147,9 +129,7 @@ export default function PatientDashboard() {
               value="3 Contacts"
               sub="Ready to alert"
             />
-
           </View>
-
         </View>
       </View>
     </ScrollView>
@@ -159,7 +139,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F3F4F6",
-    padding: 16,
   },
 
   center: {
@@ -168,60 +147,80 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
-  mainRow: {
-    flexDirection: "row",
-    marginTop: 10,
+  /* WRAPPER */
+  wrapper: {
+    padding: 16,
   },
 
+  wrapperTablet: {
+    maxWidth: 900,
+    alignSelf: "center",
+    width: "100%",
+  },
+
+  /* CONTENT */
   content: {
-    flex: 1,
-    marginLeft: 20,
+    marginTop: 16,
   },
 
   welcome: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "bold",
+    marginBottom: 4,
   },
 
   sub: {
     color: "#6B7280",
-    marginBottom: 10,
-  },
-
-  banner: {
-    height: 160,
-    borderRadius: 12,
     marginBottom: 12,
   },
 
-  btnRow: {
-    flexDirection: "row",
+  /* BANNER */
+  banner: {
+    width: "100%",
+    borderRadius: 14,
     marginBottom: 16,
+  },
+
+  /* BUTTONS */
+  btnContainer: {
+    flexDirection: "column",
+    gap: 12,
+    marginBottom: 20,
+  },
+
+  btnRowTablet: {
+    flexDirection: "row",
   },
 
   blueBtn: {
     flex: 1,
     backgroundColor: "#2563EB",
-    padding: 14,
-    borderRadius: 10,
+    padding: 16,
+    borderRadius: 12,
     alignItems: "center",
   },
 
   redBtn: {
     flex: 1,
     backgroundColor: "#EF4444",
-    padding: 14,
-    borderRadius: 10,
+    padding: 16,
+    borderRadius: 12,
     alignItems: "center",
   },
 
   btnText: {
     color: "#FFF",
     fontWeight: "600",
+    fontSize: 15,
   },
 
-  cardRow: {
-    flexDirection: "row",
+  /* CARDS */
+  cardContainer: {
+    flexDirection: "column",
     gap: 12,
+  },
+
+  cardRowTablet: {
+    flexDirection: "row",
   },
 });
