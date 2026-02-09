@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { router } from 'expo-router';
 
 export default function EmergencyCard() {
   return (
@@ -9,11 +10,14 @@ export default function EmergencyCard() {
         Press this button if you need immediate medical help
       </Text>
 
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.btnText}>
-          I NEED{"\n"}HELP NOW
-        </Text>
-      </TouchableOpacity>
+    <TouchableOpacity
+      style={styles.button}
+      onPress={() => router.push('/emergency')}
+    >
+      <Text style={styles.btnText}>
+        I NEED{"\n"}HELP NOW
+      </Text>
+    </TouchableOpacity>
 
       <Text style={styles.footer}>
         This will alert your emergency contacts

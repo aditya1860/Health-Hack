@@ -16,6 +16,7 @@ export default function Index() {
 useEffect(() => {
   const checkOnboarding = async () => {
     const done = await AsyncStorage.getItem("onboardingDone");
+    setOnboardingDone(done === "true");
     setOnboardingLoading(false);
   };
 

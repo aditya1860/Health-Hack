@@ -33,11 +33,9 @@ export const setSession = async (user: any) => {
 // get logged in user
 export const getSession = async () => {
   try {
-    const data = await AsyncStorage.getItem("session");
+    const data = await AsyncStorage.getItem(SESSION_KEY);
 
-    if (!data) {
-      return null; // 👈 CRITICAL
-    }
+    if (!data) return null;
 
     return JSON.parse(data);
   } catch (error) {

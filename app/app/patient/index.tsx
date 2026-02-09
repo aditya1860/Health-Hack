@@ -12,7 +12,6 @@ import { useRouter } from "expo-router";
 import Header from "./components/Header";
 import StatusCard from "./components/StatusCard";
 import EmergencyCard from "./components/EmergencyCard";
-
 import { useEmergency } from "../../context/EmergencyContext";
 import { getSession, logout } from "../../utils/storage";
 

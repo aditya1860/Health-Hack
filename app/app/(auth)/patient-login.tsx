@@ -173,7 +173,7 @@ return (
               />
               <Pressable
                 style={styles.btn}
-                onPress={() => router.replace("/emergency")}
+                onPress={() => router.replace("/patient")}
               >
                 <Text style={styles.btnText}>Verify & Login</Text>
               </Pressable>
