@@ -133,11 +133,6 @@ export default function Onboarding() {
         >
           {slides.map((item, i) => (
             <View key={i} style={styles.slide}>
-              {/* Status Badge */}
-              <View style={styles.statusBadge}>
-                <View style={styles.statusDot} />
-                <Text style={styles.statusText}>System Active</Text>
-              </View>
 
               {/* Title & Subtitle */}
               <Text style={styles.title}>{item.title}</Text>
