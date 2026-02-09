@@ -62,6 +62,8 @@ const loadDashboardData = async () => {
       }
     }
 
+    
+
 if (session && session.phone) {
   const phone = session.phone;
   const streakKey = `MEDICINE_STREAK_${phone}`;
@@ -184,6 +186,7 @@ if (session && session.phone) {
         >
           <Text style={styles.primaryBtnText}>Start Health Check</Text>
         </TouchableOpacity>
+        
 
         {/* LAST CHECK-IN DETAILS */}
         {lastCheckIn && (
