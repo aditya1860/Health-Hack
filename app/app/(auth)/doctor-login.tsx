@@ -7,109 +7,17 @@ import {
   StyleSheet,
   Alert,
   Platform,
+
 } from 'react-native';
 import { router } from 'expo-router';
 import { findUserByPhone, setSession } from '../../utils/storage';
+import { useEmergency } from "../context/EmergencyContext";
+import { Keyboard , TouchableWithoutFeedback ,   KeyboardAvoidingView, ScrollView} from "react-native";
+
 
 const OTP = '1234';
 
-export default function DoctorLogin() {
-  const [phone, setPhone] = useState('');
-  const [otp, setOtp] = useState('');
-  const [step, setStep] = useState<1 | 2>(1);
 
-  // ✅ SEND OTP (POPUP WORKS ON WEB + MOBILE)
-  const sendOtp = () => {
-    if (phone.length !== 10) {
-      if (Platform.OS === 'web') {
-        window.alert('Enter valid mobile number');
-      } else {
-        Alert.alert('Enter valid mobile number');
-      }
-      return;
-    }
-
-    const message = 'Your OTP is 1234 (demo purpose)';
-
-    if (Platform.OS === 'web') {
-      window.alert(message);
-    } else {
-      Alert.alert('OTP Sent', message);
-    }
-
-    setStep(2);
-  };
-
-  // ✅ VERIFY OTP
-  const verifyOtp = async () => {
-    if (otp !== OTP) {
-      Alert.alert('Invalid OTP');
-      return;
-    }
-
-    const user = await findUserByPhone(phone, 'doctor');
-    if (!user) {
-      Alert.alert('Doctor not registered', 'Please sign up first');
-      return;
-    }
-
-    await setSession(user);
-    router.replace('/doctor')
-  };
-
-  return (
-    <View style={styles.container}>
-      <View style={styles.card}>
-        <Text style={styles.title}>Doctor Login</Text>
-        <Text style={styles.subtitle}>
-          We’ll send a one-time password to your phone
-        </Text>
-
-        {step === 1 && (
-          <>
-            <TextInput
-              placeholder="+91 Mobile Number"
-              keyboardType="number-pad"
-              value={phone}
-              onChangeText={setPhone}
-              style={styles.input}
-            />
-            <Pressable style={styles.btn} onPress={sendOtp}>
-              <Text style={styles.btnText}>Send OTP</Text>
-            </Pressable>
-          </>
-        )}
-
-        {step === 2 && (
-          <>
-            <TextInput
-              placeholder="Enter OTP"
-              keyboardType="number-pad"
-              value={otp}
-              onChangeText={setOtp}
-              style={styles.input}
-            />
-            <Pressable style={styles.btn} onPress={verifyOtp}>
-              <Text style={styles.btnText}>Verify & Login</Text>
-            </Pressable>
-          </>
-        )}
-
-        <Pressable onPress={() => router.replace('/patient-login')}>
-          <Text style={styles.link}>
-            Login as <Text style={styles.linkBold}>Patient</Text>
-          </Text>
-        </Pressable>
-
-        <Pressable onPress={() => router.replace('/doctor-signup')}>
-          <Text style={styles.link}>
-            New doctor? <Text style={styles.linkBold}>Create account</Text>
-          </Text>
-        </Pressable>
-      </View>
-    </View>
-  );
-}
 
 const styles = StyleSheet.create({
   container: {
@@ -173,3 +81,136 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
+
+
+export default function DoctorLogin() {
+  const [phone, setPhone] = useState('');
+  const [otp, setOtp] = useState('');
+  const [step, setStep] = useState<1 | 2>(1);
+
+
+  // ✅ SEND OTP (POPUP WORKS ON WEB + MOBILE)
+  const sendOtp = () => {
+    if (step !== 1) return;
+    if (phone.length !== 10) {
+      if (Platform.OS === 'web') {
+        window.alert('Enter valid mobile number');
+      } else {
+        Alert.alert('Enter valid mobile number');
+      }
+      return;
+    }
+
+    const message = 'Your OTP is 1234 (demo purpose)';
+
+    if (Platform.OS === 'web') {
+      window.alert(message);
+    } else {
+      Alert.alert('OTP Sent', message);
+    }
+
+    setStep(2);
+  };
+
+  // ✅ VERIFY OTP
+const verifyOtp = async () => {
+  try {
+    if (otp !== OTP) {
+      Alert.alert("Invalid OTP");
+      return;
+    }
+
+    const user = await findUserByPhone(phone, "doctor");
+
+if (!user) {
+  Alert.alert(
+    "Account not found",
+    "No doctor account exists with this number. Please create one.",
+    [
+      {
+        text: "Create Account",
+        onPress: () => {
+          setStep(1);
+          setOtp("");
+          router.replace("/doctor-signup");
+        },
+      },
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+    ]
+  );
+  return;
+}
+    
+    const sessionUser = {
+      ...user,
+      role: "doctor",
+    };
+    
+Keyboard.dismiss();
+
+    await setSession(sessionUser);
+
+    router.replace("/doctor");
+  } catch (error) {
+    Alert.alert("Login failed", "Please try again");
+    console.error(error);
+  }
+};
+
+  return (
+  <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+    >
+      <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.card}>
+          <Text style={styles.title}>Doctor Login</Text>
+          <Text style={styles.subtitle}>
+            We’ll send a one-time password to your phone
+          </Text>
+
+          {step === 1 && (
+            <>
+              <TextInput
+                placeholder="+91 Mobile Number"
+                keyboardType="number-pad"
+                placeholderTextColor="#9CA3AF"
+                value={phone}
+                onChangeText={(t) => setPhone(t.replace(/[^0-9]/g, ""))}
+                style={styles.input}
+              />
+              <Pressable style={styles.btn} onPress={sendOtp}>
+                <Text style={styles.btnText}>Send OTP</Text>
+              </Pressable>
+            </>
+          )}
+
+          {step === 2 && (
+            <>
+              <TextInput
+                placeholder="Enter OTP"
+                keyboardType="number-pad"
+                placeholderTextColor="#9CA3AF"
+
+                value={otp}
+                onChangeText={setOtp}
+                style={styles.input}
+              />
+              <Pressable style={styles.btn} onPress={verifyOtp}>
+                <Text style={styles.btnText}>Verify & Login</Text>
+              </Pressable>
+            </>
+          )}
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
+  </TouchableWithoutFeedback>
+);
+}

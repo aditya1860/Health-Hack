@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { addUser, setSession } from '../../utils/storage';
+import { Keyboard , TouchableWithoutFeedback ,   KeyboardAvoidingView, ScrollView} from "react-native";
 
 const OTP = '1234';
 
@@ -73,98 +74,7 @@ export default function PatientSignup() {
     router.replace('/patient');
   };
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.card}>
-        <Text style={styles.title}>Patient Signup</Text>
-
-        {/* Phone + OTP */}
-        <TextInput
-          placeholder="+91 Mobile Number"
-          keyboardType="number-pad"
-          value={phone}
-          editable={!isVerified}
-          onChangeText={setPhone}
-          style={styles.input}
-        />
-
-        <TextInput
-          placeholder="Enter OTP"
-          keyboardType="number-pad"
-          value={otp}
-          onChangeText={setOtp}
-          style={styles.input}
-        />
-
-        {!isVerified && (
-          <>
-            <Pressable style={styles.btn} onPress={sendOtp}>
-              <Text style={styles.btnText}>Send OTP</Text>
-            </Pressable>
-
-            <Pressable style={styles.btn} onPress={verifyOtp}>
-              <Text style={styles.btnText}>Verify OTP</Text>
-            </Pressable>
-          </>
-        )}
-
-        {/* 👇 PATIENT DETAILS */}
-        {isVerified && (
-          <>
-            <View style={styles.divider} />
-
-            <Text style={styles.sectionTitle}>Personal Details</Text>
-
-            <TextInput
-              placeholder="Full Name (e.g. Ram Kumar)"
-              value={name}
-              onChangeText={setName}
-              style={styles.input}
-            />
-
-            <TextInput
-              placeholder="Age"
-              keyboardType="number-pad"
-              value={age}
-              onChangeText={setAge}
-              style={styles.input}
-            />
-
-            <Text style={styles.label}>Gender</Text>
-            <View style={styles.optionGrid}>
-              {['Male', 'Female', 'Other', 'Prefer not to say'].map(
-                (g) => (
-                  <Pressable
-                    key={g}
-                    onPress={() => setGender(g)}
-                    style={[
-                      styles.pill,
-                      gender === g && styles.pillActive,
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.pillText,
-                        gender === g && styles.pillTextActive,
-                      ]}
-                    >
-                      {g}
-                    </Text>
-                  </Pressable>
-                )
-              )}
-            </View>
-
-            <Pressable style={styles.btn} onPress={handleSignup}>
-              <Text style={styles.btnText}>Create Account</Text>
-            </Pressable>
-          </>
-        )}
-      </View>
-    </View>
-  );
-}
-
+  
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -253,3 +163,110 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
+
+
+return (
+  <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+    >
+      <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.card}>
+          <Text style={styles.title}>Patient Signup</Text>
+
+          {/* Phone + OTP */}
+          <TextInput
+            placeholder="+91 Mobile Number"
+            placeholderTextColor="#9CA3AF"
+            keyboardType="number-pad"
+            value={phone}
+            editable={!isVerified}
+            onChangeText={(t) => setPhone(t.replace(/[^0-9]/g, ""))}
+            style={styles.input}
+          />
+
+          <TextInput
+            placeholder="Enter OTP"
+            placeholderTextColor="#9CA3AF"
+            keyboardType="number-pad"
+            value={otp}
+            onChangeText={setOtp}
+            style={styles.input}
+          />
+
+          {!isVerified && (
+            <>
+              <Pressable style={styles.btn} onPress={sendOtp}>
+                <Text style={styles.btnText}>Send OTP</Text>
+              </Pressable>
+
+              <Pressable style={styles.btn} onPress={verifyOtp}>
+                <Text style={styles.btnText}>Verify OTP</Text>
+              </Pressable>
+            </>
+          )}
+
+          {/* 👇 PATIENT DETAILS */}
+          {isVerified && (
+            <>
+              <View style={styles.divider} />
+
+              <Text style={styles.sectionTitle}>Personal Details</Text>
+
+              <TextInput
+                placeholder="Full Name (e.g. Ram Kumar)"
+                placeholderTextColor="#9CA3AF"
+                value={name}
+                onChangeText={setName}
+                style={styles.input}
+              />
+
+              <TextInput
+                placeholder="Age"
+                placeholderTextColor="#9CA3AF"
+                keyboardType="number-pad"
+                value={age}
+                onChangeText={setAge}
+                style={styles.input}
+              />
+
+              <Text style={styles.label}>Gender</Text>
+              <View style={styles.optionGrid}>
+                {["Male", "Female", "Other", "Prefer not to say"].map(
+                  (g) => (
+                    <Pressable
+                      key={g}
+                      onPress={() => setGender(g)}
+                      style={[
+                        styles.pill,
+                        gender === g && styles.pillActive,
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.pillText,
+                          gender === g && styles.pillTextActive,
+                        ]}
+                      >
+                        {g}
+                      </Text>
+                    </Pressable>
+                  )
+                )}
+              </View>
+
+              <Pressable style={styles.btn} onPress={handleSignup}>
+                <Text style={styles.btnText}>Create Account</Text>
+              </Pressable>
+            </>
+          )}
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
+  </TouchableWithoutFeedback>
+);
+}

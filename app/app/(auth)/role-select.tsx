@@ -5,30 +5,63 @@ import { useEmergency } from "../context/EmergencyContext";
 export default function RoleSelect() {
   const { setRole } = useEmergency();
 
+  const handleSelect = async (role: "patient" | "doctor") => {
+    await setRole(role);
+    router.replace(role === "patient" ? "/patient-login" : "/doctor-login");
+  };
+
   return (
     <View style={styles.container}>
-      <View style={styles.card}>
-        <Text style={styles.title}>Welcome</Text>
-        <Text style={styles.subtitle}>Select your role</Text>
+      {/* Background visuals */}
+      <View style={styles.bgCircleOne} />
+      <View style={styles.bgCircleTwo} />
 
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.brand}>CareFast</Text>
+
+        <View style={styles.ecgLine}>
+          <View style={styles.dot} />
+          <View style={styles.line} />
+          <View style={styles.dot} />
+        </View>
+
+        <Text style={styles.tagline}>
+          Smart • Secure • Digital Healthcare
+        </Text>
+      </View>
+
+      {/* Main Card */}
+      <View style={styles.card}>
+        <Text style={styles.title}>Choose your role</Text>
+        <Text style={styles.desc}>
+          Continue to access healthcare services tailored for you
+        </Text>
+
+        {/* Patient */}
         <Pressable
-          style={styles.btn}
-          onPress={async () => {
-            await setRole("patient");
-            router.replace("/patient-login");
-          }}
+          style={({ pressed }) => [
+            styles.patientBtn,
+            pressed && styles.pressed,
+          ]}
+          onPress={() => handleSelect("patient")}
         >
-          <Text style={styles.btnText}>Continue as Patient</Text>
+          <Text style={styles.patientText}>Continue as Patient</Text>
+          <Text style={styles.subText}>Smarter care. Faster access</Text>
         </Pressable>
 
+        {/* Doctor */}
         <Pressable
-          style={styles.btn}
-          onPress={async () => {
-            await setRole("doctor");
-            router.replace("/doctor-login");
-          }}
+          style={({ pressed }) => [
+            styles.doctorBtn,
+            pressed && styles.pressedOutline,
+          ]}
+          onPress={() => handleSelect("doctor")}
         >
-          <Text style={styles.btnText}>Continue as Doctor</Text>
+          <Text style={styles.doctorText}>Continue as Doctor</Text>
+          <Text style={styles.subTextOutline}>
+            Manage patients & consultations
+          </Text>
         </Pressable>
       </View>
 
@@ -37,7 +70,6 @@ export default function RoleSelect() {
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -69,7 +101,6 @@ const styles = StyleSheet.create({
     bottom: -120,
     left: -120,
   },
-  
 
   /* Header */
   header: {
@@ -174,27 +205,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginTop: 4,
   },
-
-    subtitle: {
-    fontSize: 14,
-    color: "#6b7280",
-    textAlign: "center",
-    marginBottom: 28,
-  },
-    btn: {
-    backgroundColor: "#dc2626",
-    paddingVertical: 14,
-    borderRadius: 12,
-    marginBottom: 14,
-  },
-
-  btnText: {
-    color: "#fff",
-    textAlign: "center",
-    fontWeight: "600",
-    fontSize: 16,
-  },
-
 
   /* Interactions */
   pressed: {

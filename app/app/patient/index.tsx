@@ -6,11 +6,65 @@ import {
   TouchableOpacity,
 } from "react-native";
 
+import { useEffect, useState } from "react";
+import { useRouter } from "expo-router";
+
 import Header from "./components/Header";
 import StatusCard from "./components/StatusCard";
 import EmergencyCard from "./components/EmergencyCard";
 
-export default function Dashboard() {
+import { useEmergency } from "../context/EmergencyContext";
+import { getSession, logout } from "../../utils/storage";
+
+export default function PatientDashboard() {
+  const router = useRouter();
+
+  const { role, loading: roleLoading, setRole } =
+    useEmergency();
+
+  const [loading, setLoading] = useState(true);
+
+  /* SESSION CHECK */
+  useEffect(() => {
+    let isMounted = true;
+
+    const init = async () => {
+      if (roleLoading) return;
+
+      const user = await getSession();
+
+      if (!isMounted) return;
+
+      if (!user || user.role !== "patient") {
+        router.replace("/role-select");
+        return;
+      }
+
+      setLoading(false);
+    };
+
+    init();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [roleLoading]);
+
+  /* LOGOUT */
+  const handleLogout = async () => {
+    await logout();
+    await setRole(null);
+    router.replace("/role-select");
+  };
+
+  if (loading || roleLoading) {
+    return (
+      <View style={styles.center}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={{ flex: 1 }}>
 
@@ -41,21 +95,34 @@ export default function Dashboard() {
 
           {/* BUTTONS */}
           <View style={styles.btnRow}>
-            <TouchableOpacity style={styles.blueBtn}>
+
+            <TouchableOpacity
+              style={styles.blueBtn}
+              onPress={() =>
+                router.push("/patient/checkin")
+              }
+            >
               <Text style={styles.btnText}>
                 Start Health Check
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.redBtn}>
+            <TouchableOpacity
+              style={styles.redBtn}
+              onPress={() =>
+                router.push("/emergency")
+              }
+            >
               <Text style={styles.btnText}>
                 Emergency Help
               </Text>
             </TouchableOpacity>
+
           </View>
 
           {/* STATUS ROW */}
           <View style={styles.cardRow}>
+
             <StatusCard
               title="Today's Status"
               value="Low Risk"
@@ -73,6 +140,7 @@ export default function Dashboard() {
               value="3 Contacts"
               sub="Ready to alert"
             />
+
           </View>
 
         </View>
@@ -80,8 +148,13 @@ export default function Dashboard() {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
+  center: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
   mainRow: {
     flexDirection: "row",
     marginTop: 10,
