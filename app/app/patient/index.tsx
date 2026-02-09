@@ -37,36 +37,59 @@ export default function PatientDashboard() {
     loadDashboardData();
   }, [roleLoading]);
 
-  const loadDashboardData = async () => {
-    try {
-      const session = await getSession();
-      if (session && session.name) {
-        setUserName(session.name);
-      }
+const loadDashboardData = async () => {
+  try {
+    const session = await getSession();
 
-      const lastCheckInData = await AsyncStorage.getItem("LAST_CHECKIN");
+    if (session && session.name) {
+      setUserName(session.name);
+    }
+
+    if (session && session.phone) {
+      const phone = session.phone;
+
+      const lastCheckInData = await AsyncStorage.getItem(
+        `LAST_CHECKIN_${phone}`
+      );
+
       if (lastCheckInData) {
         const parsed = JSON.parse(lastCheckInData);
         setLastCheckIn(parsed);
         setRiskLevel(parsed.riskLevel || "Low Risk");
+      } else {
+        setLastCheckIn(null);
+        setRiskLevel("Low Risk");
       }
-
-      const streakData = await AsyncStorage.getItem("MEDICINE_STREAK");
-      if (streakData) {
-        setMedicineStreak(parseInt(streakData));
-      }
-
-      const contactsData = await AsyncStorage.getItem("EMERGENCY_CONTACTS");
-      if (contactsData) {
-        const contacts = JSON.parse(contactsData);
-        setEmergencyContacts(contacts.length);
-      }
-    } catch (error) {
-      console.error("Error loading dashboard data:", error);
-    } finally {
-      if (!roleLoading) setLoading(false);
     }
-  };
+
+if (session && session.phone) {
+  const phone = session.phone;
+  const streakKey = `MEDICINE_STREAK_${phone}`;
+
+  const streakData = await AsyncStorage.getItem(streakKey);
+  setMedicineStreak(streakData ? parseInt(streakData) : 0);
+}
+
+if (session && session.phone) {
+  const phone = session.phone;
+  const contactsKey = `EMERGENCY_CONTACTS_${phone}`;
+
+  const contactsData = await AsyncStorage.getItem(contactsKey);
+  if (contactsData) {
+    const contacts = JSON.parse(contactsData);
+    setEmergencyContacts(contacts.length);
+  } else {
+    setEmergencyContacts(0);
+  }
+}
+
+  } catch (error) {
+    console.error("Error loading dashboard data:", error);
+  } finally {
+    if (!roleLoading) setLoading(false);
+  }
+};
+
 
   const getLastCheckInText = () => {
     if (!lastCheckIn || !lastCheckIn.timestamp) return "No recent check-in";
