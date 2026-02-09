@@ -4,6 +4,8 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
+  useWindowDimensions,
+  ScrollView,
 } from "react-native";
 
 import { useEffect, useState } from "react";
@@ -13,10 +15,14 @@ import Header from "./components/Header";
 import StatusCard from "./components/StatusCard";
 import EmergencyCard from "./components/EmergencyCard";
 import { useEmergency } from "../../context/EmergencyContext";
+
+
 import { getSession, logout } from "../../utils/storage";
 
 export default function PatientDashboard() {
   const router = useRouter();
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768;
 
   const { role, loading: roleLoading, setRole } =
     useEmergency();
@@ -25,8 +31,6 @@ export default function PatientDashboard() {
 
   /* SESSION CHECK */
   useEffect(() => {
-    let isMounted = true;
-
     const init = async () => {
       if (roleLoading) return;
 
@@ -34,20 +38,8 @@ export default function PatientDashboard() {
       if (!isMounted) return;
       setLoading(false);
     };
-
     init();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [roleLoading]);
-
-  /* LOGOUT */
-  const handleLogout = async () => {
-    await logout();
-    await setRole(null);
-    router.replace("/role-select");
-  };
+  }, []);
 
   if (loading || roleLoading) {
     return (
@@ -58,17 +50,30 @@ export default function PatientDashboard() {
   }
 
   return (
-    <View style={{ flex: 1 }}>
+    <ScrollView style={styles.container}>
 
       <Header />
 
-      <View style={styles.mainRow}>
+      {/* MOBILE → Emergency on top */}
+      {isMobile && <EmergencyCard />}
 
-        {/* LEFT EMERGENCY */}
-        <EmergencyCard />
+      <View
+        style={[
+          styles.mainRow,
+          isMobile && { flexDirection: "column" },
+        ]}
+      >
 
-        {/* RIGHT CONTENT */}
-        <View style={{ flex: 1, marginLeft: 20 }}>
+        {/* WEB → Emergency left */}
+        {!isMobile && <EmergencyCard />}
+
+        {/* CONTENT */}
+        <View
+          style={[
+            styles.content,
+            isMobile && { marginLeft: 0 },
+          ]}
+        >
 
           <Text style={styles.welcome}>
             Welcome to Your Health Dashboard
@@ -86,7 +91,12 @@ export default function PatientDashboard() {
           />
 
           {/* BUTTONS */}
-          <View style={styles.btnRow}>
+          <View
+            style={[
+              styles.btnRow,
+              isMobile && { flexDirection: "column" },
+            ]}
+          >
 
             <TouchableOpacity
               style={styles.blueBtn}
@@ -100,7 +110,10 @@ export default function PatientDashboard() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.redBtn}
+              style={[
+                styles.redBtn,
+                isMobile && { marginTop: 10 },
+              ]}
               onPress={() =>
                 router.push("/emergency")
               }
@@ -111,9 +124,14 @@ export default function PatientDashboard() {
             </TouchableOpacity>
 
           </View>
-
-          {/* STATUS ROW */}
-          <View style={styles.cardRow}>
+ 
+          {/* STATUS CARDS */}
+          <View
+            style={[
+              styles.cardRow,
+              isMobile && { flexDirection: "column" },
+            ]}
+          >
 
             <StatusCard
               title="Today's Status"
@@ -137,10 +155,16 @@ export default function PatientDashboard() {
 
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#F3F4F6",
+    padding: 16,
+  },
+
   center: {
     flex: 1,
     alignItems: "center",
@@ -150,6 +174,11 @@ const styles = StyleSheet.create({
   mainRow: {
     flexDirection: "row",
     marginTop: 10,
+  },
+
+  content: {
+    flex: 1,
+    marginLeft: 20,
   },
 
   welcome: {
@@ -178,7 +207,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#2563EB",
     padding: 14,
     borderRadius: 10,
-    marginRight: 10,
+    alignItems: "center",
   },
 
   redBtn: {
@@ -186,15 +215,16 @@ const styles = StyleSheet.create({
     backgroundColor: "#EF4444",
     padding: 14,
     borderRadius: 10,
+    alignItems: "center",
   },
 
   btnText: {
     color: "#FFF",
-    textAlign: "center",
     fontWeight: "600",
   },
 
   cardRow: {
     flexDirection: "row",
+    gap: 12,
   },
 });
