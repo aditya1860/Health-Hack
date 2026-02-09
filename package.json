@@ -5,6 +5,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "expo-contacts": "~15.0.11",
     "react": "^19.2.4",
     "react-native": "^0.83.1"
   }
