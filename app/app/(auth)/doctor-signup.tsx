@@ -182,7 +182,7 @@ export default function DoctorSignup() {
   };
 
   return (
-   <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+  //  <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
@@ -300,6 +300,6 @@ export default function DoctorSignup() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+    // </TouchableWithoutFeedback>
   );
 }

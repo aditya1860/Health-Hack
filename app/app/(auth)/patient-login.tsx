@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
 
 
 return (
-  <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+  // <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1 }}
@@ -188,6 +188,6 @@ return (
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
-  </TouchableWithoutFeedback>
+  // </TouchableWithoutFeedback>
 );
 }
