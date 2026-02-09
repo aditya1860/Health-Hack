@@ -15,7 +15,6 @@ import Emergencies from './emergencies';
 
 const DoctorDashboard = () => {
   const [activeTab, setActiveTab] = useState('Patient List');
-
   const tabs = ['Patient List', 'Recent Alerts', 'Risk Trends'];
 
   const renderContent = () => {
