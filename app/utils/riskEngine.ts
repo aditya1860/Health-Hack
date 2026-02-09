@@ -1,23 +1,4 @@
-<<<<<<< HEAD
-export type RiskLevel = "Low" | "Medium" | "High";
-export interface CheckInData {
-  fever: boolean;
-  chestPain: boolean;
-  breathingDifficulty: boolean;
-  dizziness: boolean;
-  fatigue: boolean;
-}
-
-export interface RiskResult {
-  level: RiskLevel;
-  score: number;
-  explanation: string;
-  advice: string;
-}
-
-export function calculateRisk(data: CheckInData): RiskResult {
-=======
-type CheckInData = {
+export type CheckInData = {
   sugar: string;
   heartRate: string;
   bloodPressure: string;
@@ -26,7 +7,6 @@ type CheckInData = {
 };
 
 export function calculateRisk(data: CheckInData) {
->>>>>>> 8eb54539a0a010a8b650c1e5f5cf18613d560379
   let score = 0;
   const reasons: string[] = [];
 
