@@ -227,43 +227,55 @@ if (session && session.phone) {
         
 
         {/* LAST CHECK-IN DETAILS */}
-        {lastCheckIn && (
-          <View style={styles.detailsCard}>
-            <Text style={styles.detailsTitle}>Latest Health Metrics</Text>
-            <View style={styles.metricsGrid}>
-              {lastCheckIn.sugar && (
-                <View style={styles.metric}>
-                  <Text style={styles.metricLabel}>Blood Sugar</Text>
-                  <Text style={styles.metricValue}>{lastCheckIn.sugar} mg/dL</Text>
-                </View>
-              )}
-              {lastCheckIn.heartRate && (
-                <View style={styles.metric}>
-                  <Text style={styles.metricLabel}>Heart Rate</Text>
-                  <Text style={styles.metricValue}>{lastCheckIn.heartRate} bpm</Text>
-                </View>
-              )}
-              {lastCheckIn.bloodPressure && (
-                <View style={styles.metric}>
-                  <Text style={styles.metricLabel}>Blood Pressure</Text>
-                  <Text style={styles.metricValue}>{lastCheckIn.bloodPressure}</Text>
-                </View>
-              )}
-              {lastCheckIn.oxygen && (
-                <View style={styles.metric}>
-                  <Text style={styles.metricLabel}>Oxygen Level</Text>
-                  <Text style={styles.metricValue}>{lastCheckIn.oxygen}%</Text>
-                </View>
-              )}
-            </View>
-            {lastCheckIn.explanation && (
-              <View style={styles.explanationBox}>
-                <Text style={styles.explanationLabel}>Assessment</Text>
-                <Text style={styles.explanation}>{lastCheckIn.explanation}</Text>
-              </View>
-            )}
+        <View style={styles.detailsCard}>
+  <Text style={styles.detailsTitle}>Latest Health Metrics</Text>
+
+  {lastCheckIn ? (
+    <>
+      <View style={styles.metricsGrid}>
+        {lastCheckIn.sugar && (
+          <View style={styles.metric}>
+            <Text style={styles.metricLabel}>Blood Sugar</Text>
+            <Text style={styles.metricValue}>{lastCheckIn.sugar} mg/dL</Text>
           </View>
         )}
+
+        {lastCheckIn.heartRate && (
+          <View style={styles.metric}>
+            <Text style={styles.metricLabel}>Heart Rate</Text>
+            <Text style={styles.metricValue}>{lastCheckIn.heartRate} bpm</Text>
+          </View>
+        )}
+
+        {lastCheckIn.bloodPressure && (
+          <View style={styles.metric}>
+            <Text style={styles.metricLabel}>Blood Pressure</Text>
+            <Text style={styles.metricValue}>{lastCheckIn.bloodPressure}</Text>
+          </View>
+        )}
+
+        {lastCheckIn.oxygen && (
+          <View style={styles.metric}>
+            <Text style={styles.metricLabel}>Oxygen Level</Text>
+            <Text style={styles.metricValue}>{lastCheckIn.oxygen}%</Text>
+          </View>
+        )}
+      </View>
+
+      {lastCheckIn.explanation && (
+        <View style={styles.explanationBox}>
+          <Text style={styles.explanationLabel}>Assessment</Text>
+          <Text style={styles.explanation}>{lastCheckIn.explanation}</Text>
+        </View>
+      )}
+    </>
+  ) : (
+    <Text style={{ color: "#6B7280", marginTop: 8 }}>
+      No health data yet. Start your first health check to see insights here.
+    </Text>
+  )}
+</View>
+
 
         {/* HEALTH TIP */}
         <View style={styles.tipCard}>

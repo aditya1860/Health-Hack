@@ -1,18 +1,21 @@
 import React from "react";
 import { Pressable, Text, StyleSheet, Platform, View } from "react-native";
 import { router, type Href } from "expo-router";
+import { StyleProp, ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface Props {
   color?: string;
   disabled?: boolean;
   fallbackRoute?: Href;
+  style?: StyleProp<ViewStyle>;
 }
 
 export default function CommonBackButton({
   color = "#111827",
   disabled = false,
   fallbackRoute = "/",
+  style,
 }: Props) {
   const insets = useSafeAreaInsets();
 

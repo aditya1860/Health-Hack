@@ -8,14 +8,21 @@ import {
   Alert,
   ActivityIndicator,
   Image,
+  Vibration,
 } from "react-native";
 import { useState, useEffect } from "react";
 import { useRouter, useNavigation } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import NumberStepperInput from "../../components/NumberStepperInput";
 import SymptomCheckbox from "./components/SymptomCheckbox";
 import { calculateRisk } from "../../utils/riskEngine";
 import { getSession } from "../../utils/storage";
+import Slider from "@react-native-community/slider";
+import CommonBackButton from "components/CommonBackButton";
+import { useHeaderHeight } from "@react-navigation/elements";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+
 
 export default function CheckIn() {
   const router = useRouter();
@@ -30,9 +37,9 @@ export default function CheckIn() {
 
   const [sys, setSys] = useState("");
   const [dia, setDia] = useState("");
-  const [hr, setHr] = useState("");
-  const [sugar, setSugar] = useState("");
-  const [oxygen, setOxygen] = useState("");
+  const [hr, setHr] = useState(72);
+  const [sugar, setSugar] = useState(100);
+  const [oxygen, setOxygen] = useState(98);
 
   const [missedMeds, setMissedMeds] =
     useState(false);
@@ -44,23 +51,26 @@ export default function CheckIn() {
   const [lastCheckIn, setLastCheckIn] =
     useState<string | null>(null);
 
+const headerHeight = useHeaderHeight();
+const { top } = useSafeAreaInsets();
+
+
   /* ---------------- NAVBAR LOGO ---------------- */
 
-  useEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <Image
-          source={require("../../assets/images/carefast-logo.png")}
-          style={{
-            width: 36,
-            height: 36,
-            marginRight: 10,
-            resizeMode: "contain",
-          }}
-        />
-      ),
-    });
-  }, []);
+useEffect(() => {
+  navigation.setOptions({
+    headerLeft: () => (
+      <CommonBackButton fallbackRoute="/patient" />
+    ),
+    headerRight: () => (
+      <Image
+        source={require("../../assets/images/carefast-logo.png")}
+        style={{ width: 36, height: 36, marginRight: 10 }}
+      />
+    ),
+  });
+}, []);
+
 
   /* ---------------- LOAD LAST CHECKIN ---------------- */
 
@@ -219,18 +229,57 @@ export default function CheckIn() {
     }
   };
 
+  const getOxygenColor = (value: number) => {
+  if (value < 90) return "#DC2626"; // red
+  if (value < 95) return "#F59E0B"; // amber
+  return "#10B981"; // green
+};
+
+
   /* ---------------- UI ---------------- */
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>
-        Daily Health Check-In
-      </Text>
+<View style={{ flex: 1, backgroundColor: "#F3F4F6" }}>
 
-      <Text style={styles.subtitle}>
-        Answer these questions to assess your
-        current health risk
-      </Text>
+<ScrollView
+  contentContainerStyle={{
+    padding: 20,
+    paddingTop: headerHeight -35 , // 👈 key fix
+  }}
+>
+
+  
+<View style={styles.checkinHeader}>
+  <Text style={styles.dateText}>
+    {new Date().toLocaleDateString(undefined, {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+    })}
+  </Text>
+
+  <Text style={styles.timeText}>
+    {new Date().toLocaleTimeString(undefined, {
+      hour: "2-digit",
+      minute: "2-digit",
+    })}
+  </Text>
+
+  <Text style={styles.checkinTitle}>
+    Daily Health Check-in
+  </Text>
+
+  <Text style={styles.checkinSubtitle}>
+    Please enter today’s readings.  
+    This helps us keep track of your health.
+  </Text>
+</View>
+
+
+<Text style={styles.progressHint}>
+  Step 1 of 3 • Today’s Health Readings
+</Text>
+
 
       {lastCheckIn && (
         <Text style={styles.lastCheckIn}>
@@ -240,6 +289,7 @@ export default function CheckIn() {
           ).toLocaleString()}
         </Text>
       )}
+
 
       {/* BP SECTION */}
       <Text style={styles.section}>
@@ -251,6 +301,7 @@ export default function CheckIn() {
           <Text style={styles.bpLabel}>SYS</Text>
           <TextInput
             style={styles.bpInput}
+            placeholderTextColor="#9CA3AF"
             placeholder="120"
             keyboardType="numeric"
             value={sys}
@@ -265,6 +316,7 @@ export default function CheckIn() {
           <TextInput
             style={styles.bpInput}
             placeholder="80"
+            placeholderTextColor="#9CA3AF"
             keyboardType="numeric"
             value={dia}
             onChangeText={setDia}
@@ -273,42 +325,122 @@ export default function CheckIn() {
       </View>
 
       {/* OTHER VITALS */}
-      <TextInput
-        style={styles.input}
-        placeholder="Heart Rate"
-        keyboardType="numeric"
-        value={hr}
-        onChangeText={setHr}
-      />
+    <NumberStepperInput
+      label="Heart Rate"
+      value={hr}
+      onChange={setHr}
+      step={1}
+      unit="bpm"
+      min={30}
+      max={200}
+      helperText="Normal resting rate: 60–100 bpm"
+    />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Sugar"
-        keyboardType="numeric"
-        value={sugar}
-        onChangeText={setSugar}
-      />
+    <NumberStepperInput
+      label="Blood Sugar"
+      value={sugar}
+      onChange={setSugar}
+      step={5}
+      unit="mg/dL"
+      min={40}
+      max={500}
+      helperText="Normal fasting range: 70–100"
+    />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Oxygen Level"
-        keyboardType="numeric"
-        value={oxygen}
-        onChangeText={setOxygen}
-      />
+
+<Text style={styles.section}>Oxygen Level (SpO₂)</Text>
+
+<View style={styles.oxygenBox}>
+  <Text
+    style={[
+      styles.oxygenValue,
+      { color: getOxygenColor(oxygen) },
+    ]}
+  >
+    {oxygen}%
+  </Text>
+
+
+  <Slider
+    style={{ width: "100%", height: 40 }}
+    minimumValue={50}
+    maximumValue={100}
+    step={1}
+    value={oxygen}
+    onValueChange={(value) => {
+      setOxygen(value);
+
+      if (value < 88) {
+        Vibration.vibrate(80);
+      }
+    }}
+
+    minimumTrackTintColor="#2563EB"
+    maximumTrackTintColor="#D1D5DB"
+    thumbTintColor="#2563EB"
+  />
+  
+  {oxygen < 92 && (
+  <Text style={styles.oxygenWarning}>
+    Low oxygen level detected. Please rest and seek help if symptoms persist.
+  </Text>
+)}
+
+  <Text style={styles.oxygenHint}>
+    Normal range: 95–100%
+  </Text>
+</View>
+
+<Text style={styles.progressHint}>
+  Step 2 of 3 • Medicines & Symptoms
+</Text>
+
 
       {/* MED ADHERENCE */}
       <Text style={styles.section}>
         Medicine Adherence
       </Text>
 
-      <SymptomCheckbox
-        label="I missed taking my prescribed medicines today"
-        selected={missedMeds}
-        onPress={() =>
-          setMissedMeds(!missedMeds)
-        }
-      />
+<TouchableOpacity
+  style={{
+    flexDirection: "row",
+    alignItems: "center",
+  }}
+  onPress={() => setMissedMeds(!missedMeds)}
+  activeOpacity={0.7}
+>
+  {/* Checkbox */}
+  <View
+    style={{
+      width: 24,
+      height: 24,
+      borderRadius: 6,
+      borderWidth: 1,
+      borderColor: "#2563EB",
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: missedMeds ? "#2563EB" : "#FFF",
+    }}
+  >
+    {missedMeds && <View style={{ width: 12, height: 12, backgroundColor: "#FFF", borderRadius: 2 }} />}
+  </View>
+
+  {/* Label */}
+  <Text
+    style={{
+      fontSize: 14,
+      color: "#111827",
+      marginLeft: 10,
+      flex: 1,
+    }}
+    numberOfLines={1}
+    ellipsizeMode="tail" //
+  >
+    I missed taking my prescribed medicines today
+  </Text>
+</TouchableOpacity>
+      
+
 
       {/* SYMPTOMS */}
       <Text style={styles.section}>
@@ -339,6 +471,9 @@ export default function CheckIn() {
         ))}
       </View>
 
+      <Text style={styles.progressHint}>
+  Step 3 of 3 • Review & Submit
+</Text>
       {/* BUTTON */}
       <TouchableOpacity
         style={[
@@ -349,9 +484,12 @@ export default function CheckIn() {
         onPress={handleCalculateRisk}
         disabled={loading}
       >
+
+        
         {loading ? (
           <ActivityIndicator color="#FFF" />
         ) : (
+          
           <Text style={styles.buttonText}>
             Calculate Risk Level
           </Text>
@@ -394,27 +532,81 @@ export default function CheckIn() {
           </TouchableOpacity>
         </View>
       )}
-    </ScrollView>
+
+      </ScrollView>
+</View>
+
   );
 }
 
 /* ---------------- STYLES ---------------- */
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F3F4F6",
-    padding: 20,
-  },
+
+ header: {
+  marginBottom: 16,
+},
+
+
+subtitle: {
+  color: "#6B7280",
+  marginTop: 4,
+  lineHeight: 18,
+  marginBottom: 6,
+},
+
+checkinHeader: {
+  backgroundColor: "#ECFDF5", // soft green
+  borderRadius: 28,           // oval feel
+  paddingVertical: 22,
+  paddingHorizontal: 18,
+  marginBottom: 18,
+  borderWidth: 1,
+  borderColor: "#D1FAE5",
+},
+
+progressHint: {
+  textAlign: "center",
+  fontSize: 13,
+  color: "#6B7280",
+  marginBottom: 14,
+},
+
+dateText: {
+  fontSize: 13,
+  color: "#4B5563", // soft gray
+  textAlign: "center",
+  marginBottom: 2,
+},
+
+timeText: {
+  fontSize: 13,
+  color: "#4B5563",
+  textAlign: "center",
+  marginBottom: 6,
+},
+
+
+checkinTitle: {
+  fontSize: 22,
+  fontWeight: "700",
+  color: "#065F46", // deep green
+  textAlign: "center",
+},
+
+checkinSubtitle: {
+  fontSize: 14,
+  color: "#047857",
+  textAlign: "center",
+  marginTop: 8,
+  lineHeight: 20,
+},
+
 
   title: {
     fontSize: 22,
     fontWeight: "bold",
-  },
-
-  subtitle: {
-    color: "#6B7280",
-    marginBottom: 6,
+    // fontWeight: "700",
   },
 
   lastCheckIn: {
@@ -422,6 +614,14 @@ const styles = StyleSheet.create({
     color: "#6B7280",
     marginBottom: 16,
   },
+
+  backButton: {
+  position: "absolute",
+  top: 12,          // 👈 sits just below nav bar
+  left: 12,
+  zIndex: 10,
+},
+
 
   section: {
     fontSize: 16,
@@ -517,4 +717,36 @@ const styles = StyleSheet.create({
     color: "#2563EB",
     fontWeight: "600",
   },
+
+  oxygenBox: {
+  backgroundColor: "#FFF",
+  padding: 16,
+  borderRadius: 12,
+  borderWidth: 1,
+  borderColor: "#E5E7EB",
+  marginBottom: 12,
+},
+
+oxygenValue: {
+  fontSize: 22,
+  fontWeight: "700",
+  textAlign: "center",
+  marginBottom: 6,
+},
+
+oxygenHint: {
+  fontSize: 12,
+  color: "#6B7280",
+  textAlign: "center",
+  marginTop: 6,
+},
+
+oxygenWarning: {
+  color: "#DC2626",
+  fontSize: 13,
+  textAlign: "center",
+  marginTop: 6,
+  fontWeight: "600",
+},
+
 });
