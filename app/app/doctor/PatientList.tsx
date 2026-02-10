@@ -12,6 +12,8 @@ import { mockPatients } from "./mockData";
 import { mockCheckIns } from "./mockCheckIns";
 import { calculateRisk } from "../../utils/riskEngine";
 import RiskBadge from "./RiskBadge";
+import { mapCheckInToRiskInput } from "../../utils/riskEngine";
+
 
 
 /* ===================== COMPONENT ===================== */
@@ -20,8 +22,11 @@ const PatientList = () => {
   const router = useRouter();
 
   const renderPatient = ({ item }: { item: any }) => {
-    const checkIn = mockCheckIns[item.id];
-    const riskResult = checkIn ? calculateRisk(checkIn) : null;
+const checkIn = mockCheckIns[item.id];
+const riskResult = checkIn
+  ? calculateRisk(mapCheckInToRiskInput(checkIn))
+  : null;
+
     const badgeLevel = riskResult?.level ?? null;
 
 

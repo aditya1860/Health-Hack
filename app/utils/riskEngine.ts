@@ -16,6 +16,23 @@ export type CheckInData = {
   feeling: string;
 };
 
+export function mapCheckInToRiskInput(
+  checkIn: CheckInData
+): RiskInput {
+  const [sys, dia] = checkIn.bloodPressure
+    .split("/")
+    .map((v) => Number(v.trim()));
+
+  return {
+    sys,
+    dia,
+    hr: Number(checkIn.heartRate),
+    sugar: Number(checkIn.sugar),
+    spo2: Number(checkIn.oxygen),
+    symptomsCount: checkIn.feeling ? 1 : 0, // adjust logic as needed
+    missedMeds: false, // or derive from check-in later
+  };
+}
 
 export function calculateRisk(data: RiskInput) {
   const {

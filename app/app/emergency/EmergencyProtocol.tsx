@@ -3,10 +3,8 @@ import { useState, useEffect } from "react";
 import { EmergencyKey } from "./emergencyGuide";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getSession } from "../../utils/storage";
-import CommonBackButton from "../../components/CommonBackButton";
 import { router } from "expo-router";
-
-
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 
 interface EmergencyProtocolProps {
@@ -132,6 +130,10 @@ export default function EmergencyProtocol({ emergencyType, onBack }: EmergencyPr
   const [timeElapsed, setTimeElapsed] = useState(0);
   const protocol = EMERGENCY_PROTOCOLS[emergencyType];
 
+  const insets = useSafeAreaInsets();
+
+  
+
   useEffect(() => {
     const interval = setInterval(() => {
       setTimeElapsed((prev) => prev + 1);
@@ -231,25 +233,29 @@ const confirmExitEmergency = () => {
 
 
   return (
+
+    
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerTop}>
-          <View style={styles.headerLeft}>
-            <View style={styles.alertIcon}>
-              <Text style={styles.alertIconText}>!</Text>
-            </View>
-            <View style={styles.headerTextContainer}>
-              <Text style={styles.headerTitle}>Emergency Mode</Text>
-              <Text style={styles.headerSubtitle}>{protocol.title}</Text>
-            </View>
-          </View>
-          <View style={styles.timerContainer}>
-            <Text style={styles.timerText}>{formatTime(timeElapsed)}</Text>
-            <Text style={styles.timerLabel}>elapsed</Text>
-          </View>
-        </View>
-      </View>
+
+              <View
+  style={[
+    styles.emergencyHeader,
+    { paddingTop: insets.top + 12 },
+  ]}
+>
+  <Text style={styles.emergencyMode}>EMERGENCY MODE</Text>
+
+  <Text style={styles.emergencyTitle} numberOfLines={1}>
+    {protocol.title}
+  </Text>
+
+  <View style={styles.timerRow}>
+    <Text style={styles.timerLabel}>elapsed</Text>
+    <Text style={styles.timerValue}>{formatTime(timeElapsed)}</Text>
+  </View>
+</View>
+
+
 
       <ScrollView style={styles.content}>
         {/* Tabs */}
@@ -279,10 +285,6 @@ const confirmExitEmergency = () => {
             </Text>
           </Pressable>
         </View>
-
-        <CommonBackButton color="#F9FAFB" />
-
-
         
 
         {/* Action Cards */}
@@ -428,6 +430,7 @@ const styles = StyleSheet.create({
     color: "#FEE2E2",
     fontWeight: "400",
     marginTop: 2,
+    marginRight: 6,
   },
   content: {
     flex: 1,
@@ -593,4 +596,38 @@ const styles = StyleSheet.create({
   bottomPadding: {
     height: 40,
   },
+  emergencyHeader: {
+  backgroundColor: "#DC2626",
+  paddingHorizontal: 16,
+  paddingBottom: 16,
+},
+
+emergencyMode: {
+  color: "#FEE2E2",
+  fontSize: 12,
+  fontWeight: "600",
+  letterSpacing: 0.5,
+},
+
+emergencyTitle: {
+  color: "#FFFFFF",
+  fontSize: 20,
+  fontWeight: "700",
+  marginTop: 4,
+},
+
+timerRow: {
+  flexDirection: "row",
+  alignItems: "baseline",
+  marginTop: 6,
+},
+
+
+
+timerValue: {
+  color: "#FFFFFF",
+  fontSize: 18,
+  fontWeight: "700",
+},
+
 });

@@ -76,6 +76,7 @@ export default function PatientSignup() {
           <TextInput
             placeholder="+91 Mobile Number"
             keyboardType="number-pad"
+            placeholderTextColor="#9ca3af"
             value={phone}
             editable={!isVerified}
             onChangeText={(t) => setPhone(t.replace(/[^0-9]/g, ''))}
@@ -85,6 +86,7 @@ export default function PatientSignup() {
           <TextInput
             placeholder="Enter OTP"
             keyboardType="number-pad"
+            placeholderTextColor="#9ca3af"
             value={otp}
             onChangeText={setOtp}
             style={styles.input}
@@ -110,6 +112,7 @@ export default function PatientSignup() {
 
               <TextInput
                 placeholder="Full Name"
+                placeholderTextColor="#9ca3af"
                 value={name}
                 onChangeText={setName}
                 style={styles.input}
@@ -117,6 +120,7 @@ export default function PatientSignup() {
 
               <TextInput
                 placeholder="Age"
+                placeholderTextColor="#9ca3af"
                 keyboardType="number-pad"
                 value={age}
                 onChangeText={setAge}
