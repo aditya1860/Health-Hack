@@ -7,17 +7,21 @@ import {
   ScrollView,
   Alert,
 } from "react-native";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import * as Contacts from "expo-contacts";
 import { Ionicons } from "@expo/vector-icons";
 
+import {
+  getSession,
+  updateSession,
+} from "../../utils/storage"; // adjust path if needed
+
 export default function Profile() {
   /* ---------------- STATE ---------------- */
-  const [name, setName] = useState("John Doe");
-  const [age, setAge] = useState("58");
-  const [conditions, setConditions] = useState(
-    "Type 2 Diabetes, Hypertension"
-  );
+  const [name, setName] = useState("");
+  const [age, setAge] = useState("");
+  const [conditions, setConditions] =
+    useState("");
 
   const [primaryContact, setPrimaryContact] =
     useState("Not Selected");
@@ -28,9 +32,35 @@ export default function Profile() {
   const [tertiaryContact, setTertiaryContact] =
     useState("Not Selected");
 
-  const [medications, setMedications] = useState(
-    "Metformin 500mg - Twice daily\nLisinopril 10mg - Once daily"
-  );
+  const [medications, setMedications] =
+    useState("");
+
+  /* ---------------- LOAD SESSION ---------------- */
+  useEffect(() => {
+    loadProfile();
+  }, []);
+
+  const loadProfile = async () => {
+    const user = await getSession();
+
+    if (!user) return;
+
+    setName(user.name || "");
+    setAge(user.age || "");
+    setConditions(user.conditions || "");
+
+    setPrimaryContact(
+      user.primaryContact || "Not Selected"
+    );
+    setSecondaryContact(
+      user.secondaryContact || "Not Selected"
+    );
+    setTertiaryContact(
+      user.tertiaryContact || "Not Selected"
+    );
+
+    setMedications(user.medications || "");
+  };
 
   /* ------------ CONTACT PICKER ------------ */
   const pickContact = async (setContact: any) => {
@@ -40,31 +70,45 @@ export default function Profile() {
     if (status !== "granted") {
       Alert.alert(
         "Permission Denied",
-        "Allow contacts access to pick emergency contacts."
+        "Allow contacts access."
       );
       return;
     }
 
-    const { data } = await Contacts.getContactsAsync({
-      fields: [Contacts.Fields.PhoneNumbers],
-    });
+    const { data } =
+      await Contacts.getContactsAsync({
+        fields: [Contacts.Fields.PhoneNumbers],
+      });
 
     if (data.length === 0) {
       Alert.alert("No contacts found");
       return;
     }
 
-    const contact = data[0]; // simple picker (first contact)
+    const contact = data[0];
 
     setContact(
       `${contact.name} - ${
-        contact.phoneNumbers?.[0]?.number || "No Number"
+        contact.phoneNumbers?.[0]?.number ||
+        "No Number"
       }`
     );
   };
 
   /* ---------------- SAVE ---------------- */
-  const handleSave = () => {
+  const handleSave = async () => {
+    const updatedProfile = {
+      name,
+      age,
+      conditions,
+      primaryContact,
+      secondaryContact,
+      tertiaryContact,
+      medications,
+    };
+
+    await updateSession(updatedProfile);
+
     Alert.alert(
       "Profile Saved",
       "Your medical profile has been updated."
@@ -82,7 +126,10 @@ export default function Profile() {
           color="#2563EB"
         />
 
-        <Text style={styles.headerName}>{name}</Text>
+        <Text style={styles.headerName}>
+          {name || "No Name"}
+        </Text>
+
         <Text style={styles.headerSub}>
           Patient Profile
         </Text>
@@ -124,7 +171,6 @@ export default function Profile() {
           Emergency Contacts
         </Text>
 
-        {/* Contact Row */}
         {[
           {
             label: "Primary Contact",
@@ -193,6 +239,7 @@ export default function Profile() {
     </ScrollView>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

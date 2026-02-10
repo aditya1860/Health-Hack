@@ -1,50 +1,73 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
+const USERS_KEY = "USERS_DB";
+const SESSION_KEY = "CURRENT_USER";
 
-const USERS_KEY = 'USERS_DB';
-const SESSION_KEY = 'CURRENT_USER';
-
-// get all users
+/* ---------------- GET ALL USERS ---------------- */
 export const getUsers = async () => {
-  const data = await AsyncStorage.getItem(USERS_KEY);
-  return data ? JSON.parse(data) : [];
+  try {
+    const data = await AsyncStorage.getItem(USERS_KEY);
+    return data ? JSON.parse(data) : [];
+  } catch (err) {
+    console.error("Error fetching users:", err);
+    return [];
+  }
 };
 
-// add new user
+/* ---------------- ADD USER ---------------- */
 export const addUser = async (user: any) => {
   const users = await getUsers();
   users.push(user);
   await AsyncStorage.setItem(USERS_KEY, JSON.stringify(users));
 };
 
-// find user by phone + role
-export const findUserByPhone = async (phone: string, role: string) => {
+/* ---------------- FIND USER ---------------- */
+export const findUserByPhone = async (
+  phone: string,
+  role: string
+) => {
   const users = await getUsers();
   return users.find(
     (u: any) => u.phone === phone && u.role === role
   );
 };
 
-// set logged in user
+/* ---------------- SET SESSION ---------------- */
 export const setSession = async (user: any) => {
-  await AsyncStorage.setItem(SESSION_KEY, JSON.stringify(user));
+  await AsyncStorage.setItem(
+    SESSION_KEY,
+    JSON.stringify(user)
+  );
 };
 
-// get logged in user
+/* ---------------- GET SESSION ---------------- */
 export const getSession = async () => {
   try {
     const data = await AsyncStorage.getItem(SESSION_KEY);
-
-    if (!data) return null;
-
-    return JSON.parse(data);
+    return data ? JSON.parse(data) : null;
   } catch (error) {
     console.error("Failed to parse session:", error);
     return null;
   }
 };
 
-// logout (FIXED NAME)
+/* ---------------- UPDATE SESSION ---------------- */
+export const updateSession = async (
+  updatedData: any
+) => {
+  const current = await getSession();
+
+  if (!current) return;
+
+  const merged = { ...current, ...updatedData };
+
+  await AsyncStorage.setItem(
+    SESSION_KEY,
+    JSON.stringify(merged)
+  );
+};
+
+/* ---------------- LOGOUT ---------------- */
 export const logout = async () => {
   await AsyncStorage.removeItem(SESSION_KEY);
 };
