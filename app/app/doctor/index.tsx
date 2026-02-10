@@ -75,6 +75,7 @@ const loadDoctor = async () => {
 
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+              {/* <CommonBackButton /> */}
       
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
 
@@ -85,6 +86,7 @@ const loadDoctor = async () => {
     <View style={styles.actionBar}>
   <TouchableOpacity
   style={styles.connectButton}
+
   onPress={async () => {
     const session = await getSession();
 
@@ -134,7 +136,7 @@ const loadDoctor = async () => {
           ))}
         </View>
 
-        <CommonBackButton color="#F9FAFB" />
+
 
         {/* Content */}
         {renderContent()}
