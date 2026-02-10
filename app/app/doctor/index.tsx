@@ -12,6 +12,8 @@ import OverviewCards from './OverviewCards';
 import PatientList from './PatientList';
 import Analytics from './analytics';
 import Emergencies from './emergencies';
+import CommonBackButton from "../../components/CommonBackButton";
+import { Image } from "react-native";
 
 const DoctorDashboard = () => {
   const [activeTab, setActiveTab] = useState('Patient List');
@@ -36,14 +38,19 @@ const DoctorDashboard = () => {
       
       {/* Header */}
       <View style={styles.header}>
-        <View>
-          <Text style={styles.title}>CareFast</Text>
-          <Text style={styles.subtitle}>Good Overview</Text>
-        </View>
-        <View style={styles.doctorInfo}>
-          <Text style={styles.doctorName}>Dr. Sarah Smith</Text>
-          <Text style={styles.doctorSpecialty}>Clinical Physician</Text>
-        </View>
+
+      <View style={styles.logoWrapper}>
+        <Image
+          source={require("../../assets/images/carefast-logo.png")}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+      </View>
+
+      <View style={styles.doctorInfo}>
+        <Text style={styles.doctorName}>Dr. Rakesh Prasad</Text>
+        <Text style={styles.doctorSpecialty}>Clinical Physician</Text>
+      </View>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -67,6 +74,8 @@ const DoctorDashboard = () => {
           ))}
         </View>
 
+        <CommonBackButton color="#F9FAFB" />
+
         {/* Content */}
         {renderContent()}
       </ScrollView>
@@ -81,12 +90,14 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: '#fff',
-    padding: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',
+    paddingHorizontal: 16,
+    paddingTop: 18,
+    paddingBottom: 12,
   },
   title: {
     fontSize: 24,
@@ -140,6 +151,16 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '600',
   },
+  logo: {
+  width: 180,
+  height: 72,
+  marginTop: 6,
+},
+
+  logoWrapper: {
+    alignItems: 'flex-start',
+},
+
 });
 
 export default DoctorDashboard;

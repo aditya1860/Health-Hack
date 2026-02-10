@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "dependencies": {
     "@react-native-async-storage/async-storage": "^2.2.0",
     "expo": "^54.0.33"
@@ -6,5 +7,16 @@
   "devDependencies": {
     "@types/react": "~19.1.10",
     "typescript": "~5.9.2"
+=======
+  "devDependencies": {
+    "@types/react": "^19.2.13",
+    "@types/react-native": "^0.72.8",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "expo-contacts": "~15.0.11",
+    "react": "^19.2.4",
+    "react-native": "^0.83.1"
+>>>>>>> 550853639164a40f4bda6640d7c0c9335af5e899
   }
 }

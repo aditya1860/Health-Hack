@@ -1,94 +1,277 @@
-import { View, Text, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+} from "react-native";
+import { useState } from "react";
+import * as Contacts from "expo-contacts";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function Profile() {
-  return (
-    <View style={styles.container}>
+  /* ---------------- STATE ---------------- */
+  const [name, setName] = useState("John Doe");
+  const [age, setAge] = useState("58");
+  const [conditions, setConditions] = useState(
+    "Type 2 Diabetes, Hypertension"
+  );
 
-      {/* TITLE */}
-      <Text style={styles.title}>Profile Settings</Text>
-      <Text style={styles.subtitle}>
-        Manage your health information and emergency contacts
-      </Text>
+  const [primaryContact, setPrimaryContact] =
+    useState("Not Selected");
+
+  const [secondaryContact, setSecondaryContact] =
+    useState("Not Selected");
+
+  const [tertiaryContact, setTertiaryContact] =
+    useState("Not Selected");
+
+  const [medications, setMedications] = useState(
+    "Metformin 500mg - Twice daily\nLisinopril 10mg - Once daily"
+  );
+
+  /* ------------ CONTACT PICKER ------------ */
+  const pickContact = async (setContact: any) => {
+    const { status } =
+      await Contacts.requestPermissionsAsync();
+
+    if (status !== "granted") {
+      Alert.alert(
+        "Permission Denied",
+        "Allow contacts access to pick emergency contacts."
+      );
+      return;
+    }
+
+    const { data } = await Contacts.getContactsAsync({
+      fields: [Contacts.Fields.PhoneNumbers],
+    });
+
+    if (data.length === 0) {
+      Alert.alert("No contacts found");
+      return;
+    }
+
+    const contact = data[0]; // simple picker (first contact)
+
+    setContact(
+      `${contact.name} - ${
+        contact.phoneNumbers?.[0]?.number || "No Number"
+      }`
+    );
+  };
+
+  /* ---------------- SAVE ---------------- */
+  const handleSave = () => {
+    Alert.alert(
+      "Profile Saved",
+      "Your medical profile has been updated."
+    );
+  };
+
+  /* ---------------- UI ---------------- */
+  return (
+    <ScrollView style={styles.container}>
+      {/* HEADER */}
+      <View style={styles.headerCard}>
+        <Ionicons
+          name="person-circle"
+          size={70}
+          color="#2563EB"
+        />
+
+        <Text style={styles.headerName}>{name}</Text>
+        <Text style={styles.headerSub}>
+          Patient Profile
+        </Text>
+      </View>
 
       {/* PERSONAL INFO */}
-      <Text style={styles.section}>Personal Information</Text>
+      <View style={styles.card}>
+        <Text style={styles.sectionTitle}>
+          Personal Information
+        </Text>
 
-      <Text style={styles.item}>
-        <Text style={styles.bold}>Name:</Text> John Doe
-      </Text>
+        <TextInput
+          style={styles.input}
+          value={name}
+          onChangeText={setName}
+          placeholder="Full Name"
+        />
 
-      <Text style={styles.item}>
-        <Text style={styles.bold}>Age:</Text> 58 years
-      </Text>
+        <TextInput
+          style={styles.input}
+          value={age}
+          onChangeText={setAge}
+          placeholder="Age"
+          keyboardType="numeric"
+        />
 
-      <Text style={styles.item}>
-        <Text style={styles.bold}>Conditions:</Text> Type 2 Diabetes, Hypertension
-      </Text>
+        <TextInput
+          style={[styles.input, { height: 80 }]}
+          value={conditions}
+          onChangeText={setConditions}
+          placeholder="Medical Conditions"
+          multiline
+        />
+      </View>
 
       {/* CONTACTS */}
-      <Text style={styles.section}>Emergency Contacts</Text>
+      <View style={styles.card}>
+        <Text style={styles.sectionTitle}>
+          Emergency Contacts
+        </Text>
 
-      <Text style={styles.item}>
-        <Text style={styles.bold}>Primary:</Text> Jane Doe (Spouse) - +91 98765 43210
-      </Text>
+        {/* Contact Row */}
+        {[
+          {
+            label: "Primary Contact",
+            value: primaryContact,
+            setter: setPrimaryContact,
+          },
+          {
+            label: "Secondary Contact",
+            value: secondaryContact,
+            setter: setSecondaryContact,
+          },
+          {
+            label: "Tertiary Contact",
+            value: tertiaryContact,
+            setter: setTertiaryContact,
+          },
+        ].map((c, i) => (
+          <View key={i} style={styles.contactRow}>
+            <TextInput
+              style={[styles.input, { flex: 1 }]}
+              value={c.value}
+              onChangeText={c.setter}
+              placeholder={c.label}
+            />
 
-      <Text style={styles.item}>
-        <Text style={styles.bold}>Secondary:</Text> Dr. Smith (Physician) - +91 98765 43211
-      </Text>
-
-      <Text style={styles.item}>
-        <Text style={styles.bold}>Tertiary:</Text> Sarah Doe (Daughter) - +91 98765 43212
-      </Text>
+            <TouchableOpacity
+              style={styles.pickBtn}
+              onPress={() =>
+                pickContact(c.setter)
+              }
+            >
+              <Ionicons
+                name="call"
+                size={18}
+                color="#FFF"
+              />
+            </TouchableOpacity>
+          </View>
+        ))}
+      </View>
 
       {/* MEDICATIONS */}
-      <Text style={styles.section}>Current Medications</Text>
+      <View style={styles.card}>
+        <Text style={styles.sectionTitle}>
+          Current Medications
+        </Text>
 
-      <Text style={styles.item}>
-        • Metformin 500mg - Twice daily
-      </Text>
+        <TextInput
+          style={[styles.input, { height: 120 }]}
+          value={medications}
+          onChangeText={setMedications}
+          multiline
+          placeholder="List medications..."
+        />
+      </View>
 
-      <Text style={styles.item}>
-        • Lisinopril 10mg - Once daily
-      </Text>
-
-      <Text style={styles.item}>
-        • Aspirin 81mg - Once daily
-      </Text>
-
-    </View>
+      {/* SAVE BUTTON */}
+      <TouchableOpacity
+        style={styles.saveBtn}
+        onPress={handleSave}
+      >
+        <Text style={styles.saveText}>
+          Save Changes
+        </Text>
+      </TouchableOpacity>
+    </ScrollView>
   );
 }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F3F4F6",
+    padding: 16,
+  },
+
+  /* HEADER */
+  headerCard: {
+    backgroundColor: "#FFF",
     padding: 20,
+    borderRadius: 16,
+    alignItems: "center",
+    marginBottom: 16,
+    elevation: 3,
   },
 
-  title: {
-    fontSize: 22,
+  headerName: {
+    fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 4,
+    marginTop: 6,
   },
 
-  subtitle: {
+  headerSub: {
     color: "#6B7280",
-    marginBottom: 20,
   },
 
-  section: {
+  /* CARD */
+  card: {
+    backgroundColor: "#FFF",
+    padding: 16,
+    borderRadius: 16,
+    marginBottom: 16,
+    elevation: 2,
+  },
+
+  sectionTitle: {
     fontSize: 16,
     fontWeight: "600",
-    marginTop: 16,
-    marginBottom: 10,
+    marginBottom: 12,
   },
 
-  item: {
-    marginBottom: 8,
-    color: "#374151",
+  /* INPUT */
+  input: {
+    backgroundColor: "#F9FAFB",
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
   },
 
-  bold: {
+  /* CONTACT ROW */
+  contactRow: {
+    flexDirection: "row",
+    gap: 10,
+    alignItems: "center",
+  },
+
+  pickBtn: {
+    backgroundColor: "#10B981",
+    padding: 12,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  /* SAVE */
+  saveBtn: {
+    backgroundColor: "#2563EB",
+    padding: 16,
+    borderRadius: 14,
+    alignItems: "center",
+    marginBottom: 40,
+  },
+
+  saveText: {
+    color: "#FFF",
     fontWeight: "600",
+    fontSize: 16,
   },
 });
