@@ -1,25 +1,25 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack, router } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { EmergencyProvider } from '../context/EmergencyContext';
-import { BackHandler, Platform } from 'react-native';
-import { useColorScheme } from '../hooks/use-color-scheme';
-import { useEffect } from 'react';
+import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
+import { Stack, router } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { EmergencyProvider } from "../context/EmergencyContext";
+import { BackHandler, Platform } from "react-native";
+import { useColorScheme } from "../hooks/use-color-scheme";
+import { useEffect } from "react";
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme(); // 👈 missing line
+  const colorScheme = useColorScheme();
 
   useEffect(() => {
-    if (Platform.OS !== 'android') return;
+    if (Platform.OS !== "android") return;
 
     const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
+      "hardwareBackPress",
       () => {
         if (router.canGoBack()) {
           router.back();
           return true;
         }
-        return false; // exit app if no history
+        return false;
       }
     );
 
@@ -28,7 +28,7 @@ export default function RootLayout() {
 
   return (
     <EmergencyProvider>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <Stack
           screenOptions={{ headerShown: false }}
           initialRouteName="index"
