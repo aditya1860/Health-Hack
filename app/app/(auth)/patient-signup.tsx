@@ -7,50 +7,41 @@ import {
   StyleSheet,
   Alert,
   Platform,
+  KeyboardAvoidingView,
+  ScrollView,
 } from 'react-native';
 import { router } from 'expo-router';
 import { addUser, setSession } from '../../utils/storage';
-import { Keyboard , TouchableWithoutFeedback ,   KeyboardAvoidingView, ScrollView} from "react-native";
 
 const OTP = '1234';
 
 export default function PatientSignup() {
   const [isVerified, setIsVerified] = useState(false);
-
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
-
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
   const [gender, setGender] = useState('');
 
-  // ✅ SEND OTP (POPUP WORKS ON WEB + MOBILE)
   const sendOtp = () => {
     if (phone.length !== 10) {
-      if (Platform.OS === 'web') {
-        window.alert('Invalid phone number');
-      } else {
-        Alert.alert('Invalid phone number');
-      }
+      Platform.OS === 'web'
+        ? window.alert('Invalid phone number')
+        : Alert.alert('Invalid phone number');
       return;
     }
 
     const message = 'Your OTP is 1234 (demo purpose)';
-
-    if (Platform.OS === 'web') {
-      window.alert(message);
-    } else {
-      Alert.alert('OTP Sent', message);
-    }
+    Platform.OS === 'web'
+      ? window.alert(message)
+      : Alert.alert('OTP Sent', message);
   };
 
-  // ✅ VERIFY OTP
   const verifyOtp = () => {
     if (otp !== OTP) {
       Alert.alert('Invalid OTP');
       return;
     }
-
     setIsVerified(true);
   };
 
@@ -60,21 +51,112 @@ export default function PatientSignup() {
       return;
     }
 
-    const patient = {
-      role: 'patient',
-      phone,
-      name,
-      age,
-      gender,
-    };
-
+    const patient = { role: 'patient', phone, name, age, gender };
     await addUser(patient);
     await setSession(patient);
-
     router.replace('/patient');
   };
 
-  
+  return (
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1 }}
+    >
+      <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+      >
+        {/* 🔴 Background blobs */}
+        <View style={styles.blobTopLeft} />
+        <View style={styles.blobBottomRight} />
+
+        <View style={styles.card}>
+          <Text style={styles.title}>Patient Signup</Text>
+
+          <TextInput
+            placeholder="+91 Mobile Number"
+            keyboardType="number-pad"
+            value={phone}
+            editable={!isVerified}
+            onChangeText={(t) => setPhone(t.replace(/[^0-9]/g, ''))}
+            style={styles.input}
+          />
+
+          <TextInput
+            placeholder="Enter OTP"
+            keyboardType="number-pad"
+            value={otp}
+            onChangeText={setOtp}
+            style={styles.input}
+          />
+
+          {!isVerified && (
+            <>
+              <Pressable style={styles.btn} onPress={sendOtp}>
+                <Text style={styles.btnText}>Send OTP</Text>
+              </Pressable>
+
+              <Pressable style={styles.btn} onPress={verifyOtp}>
+                <Text style={styles.btnText}>Verify OTP</Text>
+              </Pressable>
+            </>
+          )}
+
+          {isVerified && (
+            <>
+              <View style={styles.divider} />
+
+              <Text style={styles.sectionTitle}>Personal Details</Text>
+
+              <TextInput
+                placeholder="Full Name"
+                value={name}
+                onChangeText={setName}
+                style={styles.input}
+              />
+
+              <TextInput
+                placeholder="Age"
+                keyboardType="number-pad"
+                value={age}
+                onChangeText={setAge}
+                style={styles.input}
+              />
+
+              <Text style={styles.label}>Gender</Text>
+              <View style={styles.optionGrid}>
+                {['Male', 'Female', 'Other', 'Prefer not to say'].map((g) => (
+                  <Pressable
+                    key={g}
+                    onPress={() => setGender(g)}
+                    style={[
+                      styles.pill,
+                      gender === g && styles.pillActive,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.pillText,
+                        gender === g && styles.pillTextActive,
+                      ]}
+                    >
+                      {g}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+
+              <Pressable style={styles.btn} onPress={handleSignup}>
+                <Text style={styles.btnText}>Create Account</Text>
+              </Pressable>
+            </>
+          )}
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
+  );
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -162,111 +244,24 @@ const styles = StyleSheet.create({
     color: '#dc2626',
     fontWeight: '600',
   },
+
+  /* 🔴 Background blobs */
+  blobTopLeft: {
+    position: 'absolute',
+    width: 240,
+    height: 240,
+    backgroundColor: '#fecaca',
+    borderRadius: 240,
+    top: -100,
+    left: -100,
+  },
+  blobBottomRight: {
+    position: 'absolute',
+    width: 280,
+    height: 280,
+    backgroundColor: '#fee2e2',
+    borderRadius: 280,
+    bottom: -120,
+    right: -120,
+  },
 });
-
-
-return (
-  // <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ flex: 1 }}
-    >
-      <ScrollView
-        contentContainerStyle={styles.container}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View style={styles.card}>
-          <Text style={styles.title}>Patient Signup</Text>
-
-          {/* Phone + OTP */}
-          <TextInput
-            placeholder="+91 Mobile Number"
-            placeholderTextColor="#9CA3AF"
-            keyboardType="number-pad"
-            value={phone}
-            editable={!isVerified}
-            onChangeText={(t) => setPhone(t.replace(/[^0-9]/g, ""))}
-            style={styles.input}
-          />
-
-          <TextInput
-            placeholder="Enter OTP"
-            placeholderTextColor="#9CA3AF"
-            keyboardType="number-pad"
-            value={otp}
-            onChangeText={setOtp}
-            style={styles.input}
-          />
-
-          {!isVerified && (
-            <>
-              <Pressable style={styles.btn} onPress={sendOtp}>
-                <Text style={styles.btnText}>Send OTP</Text>
-              </Pressable>
-
-              <Pressable style={styles.btn} onPress={verifyOtp}>
-                <Text style={styles.btnText}>Verify OTP</Text>
-              </Pressable>
-            </>
-          )}
-
-          {/* 👇 PATIENT DETAILS */}
-          {isVerified && (
-            <>
-              <View style={styles.divider} />
-
-              <Text style={styles.sectionTitle}>Personal Details</Text>
-
-              <TextInput
-                placeholder="Full Name (e.g. Ram Kumar)"
-                placeholderTextColor="#9CA3AF"
-                value={name}
-                onChangeText={setName}
-                style={styles.input}
-              />
-
-              <TextInput
-                placeholder="Age"
-                placeholderTextColor="#9CA3AF"
-                keyboardType="number-pad"
-                value={age}
-                onChangeText={setAge}
-                style={styles.input}
-              />
-
-              <Text style={styles.label}>Gender</Text>
-              <View style={styles.optionGrid}>
-                {["Male", "Female", "Other", "Prefer not to say"].map(
-                  (g) => (
-                    <Pressable
-                      key={g}
-                      onPress={() => setGender(g)}
-                      style={[
-                        styles.pill,
-                        gender === g && styles.pillActive,
-                      ]}
-                    >
-                      <Text
-                        style={[
-                          styles.pillText,
-                          gender === g && styles.pillTextActive,
-                        ]}
-                      >
-                        {g}
-                      </Text>
-                    </Pressable>
-                  )
-                )}
-              </View>
-
-              <Pressable style={styles.btn} onPress={handleSignup}>
-                <Text style={styles.btnText}>Create Account</Text>
-              </Pressable>
-            </>
-          )}
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
-  // </TouchableWithoutFeedback>
-);
-}

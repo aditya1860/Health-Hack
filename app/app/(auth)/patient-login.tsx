@@ -11,7 +11,13 @@ import {
 import { router } from 'expo-router';
 import { findUserByPhone, setSession } from '../../utils/storage';
 import { useEmergency } from '../../context/EmergencyContext';
-import { Keyboard , TouchableWithoutFeedback ,   KeyboardAvoidingView, ScrollView} from "react-native";
+import {
+  Keyboard,
+  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  ScrollView,
+} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const OTP = '1234';
 
@@ -22,7 +28,7 @@ export default function PatientLogin() {
   const [otp, setOtp] = useState('');
   const [step, setStep] = useState<1 | 2>(1);
 
-  // 🔒 Guard (wait for AsyncStorage to load)
+  // 🔒 Guard
   useEffect(() => {
     if (loading) return;
 
@@ -31,13 +37,25 @@ export default function PatientLogin() {
     }
   }, [role, loading]);
 
-  const sendOtp = () => {
+  // 📦 Load saved phone from local storage
+  useEffect(() => {
+    const loadPhone = async () => {
+      const savedPhone = await AsyncStorage.getItem('patient_phone');
+      if (savedPhone) setPhone(savedPhone);
+    };
+    loadPhone();
+  }, []);
+
+  const sendOtp = async () => {
     if (phone.length !== 10) {
       Platform.OS === 'web'
         ? window.alert('Enter valid mobile number')
         : Alert.alert('Enter valid mobile number');
       return;
     }
+
+    // 💾 Save phone locally
+    await AsyncStorage.setItem('patient_phone', phone);
 
     const message = 'Your OTP is 1234 (demo purpose)';
     Platform.OS === 'web'
@@ -59,16 +77,82 @@ export default function PatientLogin() {
       return;
     }
 
-    await setSession(user);      
-    await setRole('patient');    
-    router.replace('/');   
+    await setSession(user);
+    await setRole('patient');
+    router.replace('/');
   };
 
-  
+  return (
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1 }}
+    >
+      <View style={styles.wrapper}>
+        {/* 🔴 Background Blobs */}
+        <View style={styles.blobTopLeft} />
+        <View style={styles.blobBottomRight} />
+
+        <ScrollView
+          contentContainerStyle={styles.container}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.card}>
+            <Text style={styles.title}>Patient Login</Text>
+            <Text style={styles.subtitle}>
+              We’ll send a one-time password to your phone
+            </Text>
+
+            {step === 1 && (
+              <>
+                <TextInput
+                  placeholder="+91 Mobile Number"
+                  placeholderTextColor="#9CA3AF"
+                  keyboardType="number-pad"
+                  value={phone}
+                  onChangeText={(t) => setPhone(t.replace(/[^0-9]/g, ''))}
+                  style={styles.input}
+                />
+                <Pressable style={styles.btn} onPress={sendOtp}>
+                  <Text style={styles.btnText}>Send OTP</Text>
+                </Pressable>
+              </>
+            )}
+
+            {step === 2 && (
+              <>
+                <TextInput
+                  placeholder="Enter OTP"
+                  placeholderTextColor="#9CA3AF"
+                  keyboardType="number-pad"
+                  value={otp}
+                  onChangeText={setOtp}
+                  style={styles.input}
+                />
+                <Pressable style={styles.btn} onPress={verifyOtp}>
+                  <Text style={styles.btnText}>Verify & Login</Text>
+                </Pressable>
+              </>
+            )}
+
+            <Pressable onPress={() => router.replace('/patient-signup')}>
+              <Text style={styles.link}>
+                New user? <Text style={styles.linkBold}>Create account</Text>
+              </Text>
+            </Pressable>
+          </View>
+        </ScrollView>
+      </View>
+    </KeyboardAvoidingView>
+  );
+}
+
 const styles = StyleSheet.create({
-  container: {
+  wrapper: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#fff',
+  },
+  container: {
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
@@ -126,68 +210,26 @@ const styles = StyleSheet.create({
     color: '#dc2626',
     fontWeight: '600',
   },
+
+  // 🔴 Red light blobs
+  blobTopLeft: {
+    position: 'absolute',
+    top: -120,
+    left: -120,
+    width: 260,
+    height: 260,
+    backgroundColor: '#fecaca',
+    borderRadius: 200,
+    opacity: 0.6,
+  },
+  blobBottomRight: {
+    position: 'absolute',
+    bottom: -140,
+    right: -140,
+    width: 300,
+    height: 300,
+    backgroundColor: '#fee2e2',
+    borderRadius: 200,
+    opacity: 0.7,
+  },
 });
-
-
-return (
-  // <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ flex: 1 }}
-    >
-      <ScrollView
-        contentContainerStyle={styles.container}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View style={styles.card}>
-          <Text style={styles.title}>Patient Login</Text>
-          <Text style={styles.subtitle}>
-            We’ll send a one-time password to your phone
-          </Text>
-
-          {step === 1 && (
-            <>
-              <TextInput
-                placeholder="+91 Mobile Number"
-                placeholderTextColor="#9CA3AF"
-                keyboardType="number-pad"
-                value={phone}
-                onChangeText={(t) => setPhone(t.replace(/[^0-9]/g, ""))}
-                style={styles.input}
-              />
-              <Pressable style={styles.btn} onPress={sendOtp}>
-                <Text style={styles.btnText}>Send OTP</Text>
-              </Pressable>
-            </>
-          )}
-
-          {step === 2 && (
-            <>
-              <TextInput
-                placeholder="Enter OTP"
-                placeholderTextColor="#9CA3AF"
-                keyboardType="number-pad"
-                value={otp}
-                onChangeText={setOtp}
-                style={styles.input}
-              />
-              <Pressable
-                style={styles.btn}
-                onPress={verifyOtp}
-              >
-                <Text style={styles.btnText}>Verify & Login</Text>
-              </Pressable>
-            </>
-          )}
-
-          <Pressable onPress={() => router.replace("/patient-signup")}>
-            <Text style={styles.link}>
-              New user? <Text style={styles.linkBold}>Create account</Text>
-            </Text>
-          </Pressable>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
-  // </TouchableWithoutFeedback>
-);
-}
