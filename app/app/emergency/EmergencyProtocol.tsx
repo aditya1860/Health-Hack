@@ -156,6 +156,7 @@ export default function EmergencyProtocol({ emergencyType, onBack }: EmergencyPr
     }
   };
 
+
   const handleExitEmergency = async () => {
   const session = await getSession();
 
@@ -202,9 +203,31 @@ export default function EmergencyProtocol({ emergencyType, onBack }: EmergencyPr
   if (onBack) {
     onBack();
   } else {
-    router.replace("/");
+    router.replace("/patient");
   }
 };
+
+const confirmExitEmergency = () => {
+  Alert.alert(
+    "Confirm Safety",
+    "Please confirm that you are safe. This will exit Emergency Mode.",
+    [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Yes, I am safe",
+        style: "destructive",
+        onPress: async () => {
+          await handleExitEmergency();
+          router.replace("/patient");
+        },
+      },
+    ]
+  );
+};
+
 
 
   return (
@@ -330,23 +353,7 @@ export default function EmergencyProtocol({ emergencyType, onBack }: EmergencyPr
         {/* Exit Emergency */}
         <Pressable
           style={styles.exitButton}
-          onPress={() => {
-            Alert.alert(
-              "Exit Emergency Mode",
-              "Are you sure you are safe now?",
-              [
-                { text: "Stay in Emergency", style: "cancel" },
-{
-  text: "Yes, I'm Safe",
-  onPress: () => {
-    setTimeout(() => {
-      handleExitEmergency();
-    }, 0);
-  },
-},
-              ]
-            );
-          }}
+          onPress={confirmExitEmergency}
         >
           <Text style={styles.exitButtonText}>I Feel Safe Now</Text>
         </Pressable>
