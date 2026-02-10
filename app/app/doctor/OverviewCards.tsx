@@ -30,7 +30,7 @@ const OverviewCards = () => {
       {cards.map((card, index) => (
         <View key={index} style={[styles.card, { borderColor: card.color }]}>
           <Text style={styles.value}>{card.value}</Text>
-          <Text style={styles.label}>{card.label}</Text>
+          <Text style={styles.label} numberOfLines={2}>{card.label}</Text>
         </View>
       ))}
     </ScrollView>
@@ -48,7 +48,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     marginRight: 12,
-    minWidth: 140,
+    width: 140,              // Changed from minWidth to width
+    maxWidth: 140,           // Added for extra constraint
     borderWidth: 1,
   },
   value: {
@@ -60,5 +61,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#6B7280',
     marginTop: 4,
+    flexWrap: 'wrap',        // Added to ensure text wraps
   },
 });
