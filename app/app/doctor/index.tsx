@@ -14,6 +14,8 @@ import Analytics from './analytics';
 import Emergencies from './emergencies';
 import CommonBackButton from "../../components/CommonBackButton";
 import { Image } from "react-native";
+import AppHeader from "../../components/AppHeader";
+
 
 const DoctorDashboard = () => {
   const [activeTab, setActiveTab] = useState('Patient List');
@@ -33,6 +35,12 @@ const DoctorDashboard = () => {
   };
 
   return (
+
+      <View style={{ flex: 1 }}>
+    <AppHeader
+      title="Dr. Rakesh Prasad"
+      subtitle="Clinical Physician"
+    />
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       
@@ -80,6 +88,7 @@ const DoctorDashboard = () => {
         {renderContent()}
       </ScrollView>
     </SafeAreaView>
+    </View>
   );
 };
 

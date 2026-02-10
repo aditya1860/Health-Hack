@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, Pressable, ScrollView, SafeAreaView, StatusBar } from "react-native";
 import { EmergencyKey } from "./emergencyGuide";
+import CommonBackButton from "../../components/CommonBackButton";
 
 const EMERGENCY_TYPES: { key: EmergencyKey; label: string; color: string }[] = [
   { key: "heart", label: "Heart Attack", color: "#EF4444" },
@@ -90,6 +91,13 @@ export default function EmergencyGreeting({ onSelectType }: EmergencyGreetingPro
           <Text style={styles.title}>What is the nature of the emergency?</Text>
         </View>
 
+        {/* Back Button – top left */}
+<View style={styles.backButton}>
+  <CommonBackButton color="#111827" />
+</View>
+
+
+
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           {EMERGENCY_TYPES.map((type) => (
             <Pressable
@@ -103,6 +111,8 @@ export default function EmergencyGreeting({ onSelectType }: EmergencyGreetingPro
             </Pressable>
           ))}
         </ScrollView>
+
+
         
         <View style={styles.minimalFooter}>
           <Text style={styles.footerText}>Help will be dispatched to your current location immediately.</Text>
@@ -183,7 +193,12 @@ export default function EmergencyGreeting({ onSelectType }: EmergencyGreetingPro
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F8FAFC" },
-  header: { paddingTop: 40, paddingHorizontal: 24, paddingBottom: 20 },
+header: {
+  paddingTop: 72,   // pushed down to clear back button
+  paddingHorizontal: 24,
+  paddingBottom: 20,
+},
+
   headerLabel: { fontSize: 12, fontWeight: "800", color: "#94A3B8", letterSpacing: 1.5, marginBottom: 8 },
   title: { fontSize: 28, fontWeight: "700", color: "#0F172A", lineHeight: 34 },
   scrollContent: { paddingHorizontal: 24, paddingBottom: 24, gap: 12 },
@@ -244,5 +259,15 @@ const styles = StyleSheet.create({
   callButton: { flex: 1, paddingVertical: 16, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
   callButtonText: { color: '#FFFFFF', fontWeight: '700', fontSize: 15 },
   cancelLink: { alignSelf: 'center', marginTop: 24, padding: 10 },
-  cancelLinkText: { color: '#94A3B8', fontWeight: '600', fontSize: 14, textDecorationLine: 'underline' }
+  cancelLinkText: { color: '#94A3B8', fontWeight: '600', fontSize: 14, textDecorationLine: 'underline' },
+
+  backButton: {
+  position: "absolute",
+  top: 12,
+  left: 12,
+  zIndex: 10,
+}
+
+
+
 });

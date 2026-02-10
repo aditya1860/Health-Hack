@@ -7,19 +7,21 @@ import {
   ScrollView,
   ActivityIndicator,
 } from "react-native";
-
 import { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
-
-import Header from "./components/Header";
 import StatusCard from "./components/StatusCard";
 import EmergencyCard from "./components/EmergencyCard";
 import CheckInCalendar from "./components/CheckInCalendar";
 import { useEmergency } from "../../context/EmergencyContext";
 import { getSession } from "../../utils/storage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import AppHeader from "../../components/AppHeader";
+
+
+
 
 export default function PatientDashboard() {
+
   const router = useRouter();
   const { width } = useWindowDimensions();
 
@@ -125,6 +127,11 @@ if (session && session.phone) {
   }
 
   return (
+    
+  <View style={{ flex: 1 }}>
+    <AppHeader title="Patient Dashboard" />
+  
+    
     <ScrollView style={styles.container}>
       <View
         style={[
@@ -132,7 +139,6 @@ if (session && session.phone) {
           isTablet && styles.wrapperTablet,
         ]}
       >
-        <Header />
 
         {/* WELCOME SECTION */}
         <View style={styles.welcomeSection}>
@@ -168,6 +174,8 @@ if (session && session.phone) {
             sub={emergencyContacts > 0 ? "Ready to alert" : "Add contacts"}
           />
         </View>
+
+        
 
         {/* CHECK-IN CALENDAR */}
         <View style={styles.sectionSpacing}>
@@ -233,9 +241,12 @@ if (session && session.phone) {
           <Text style={styles.tipText}>
             Consistent daily check-ins help establish patterns and detect early warning signs. Your 14-day streak tracker above shows your commitment to health monitoring.
           </Text>
+
+          
         </View>
       </View>
     </ScrollView>
+    </View>
   );
 }
 
