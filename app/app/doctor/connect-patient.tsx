@@ -2,15 +2,30 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { useState } from "react";
 import CommonBackButton from "../../components/CommonBackButton";
 import * as Clipboard from "expo-clipboard";
+import { getSession } from "../../utils/storage";
+import { saveConnectionCode } from "../../utils/connections";
+
 
 export default function ConnectPatient() {
   const [code, setCode] = useState<string | null>(null);
 
-  const generateCode = () => {
-    const newCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-    setCode(newCode);
-    Alert.alert("Code Generated", "Share this code with the patient.");
-  };
+const generateCode = async () => {
+  const newCode = Math.random()
+    .toString(36)
+    .substring(2, 8)
+    .toUpperCase();
+
+  const session = await getSession();
+  if (!session?.id) {
+    Alert.alert("Error", "Doctor session not found.");
+    return;
+  }
+
+  await saveConnectionCode(newCode, session.id);
+  setCode(newCode);
+
+  Alert.alert("Code Generated", "Share this code with the patient.");
+};
 
   const copyCode = async () => {
     if (!code) return;

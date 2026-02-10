@@ -8,21 +8,44 @@ import {
 } from "react-native";
 import { useState } from "react";
 import CommonBackButton from "../../components/CommonBackButton";
+import { getSession } from "../../utils/storage";
+import { consumeConnectionCode } from "../../utils/connections";
+import { router } from "expo-router";
+
 
 export default function ConnectDoctor() {
   const [code, setCode] = useState("");
 
-  const handleConnect = () => {
-    if (!code.trim()) {
-      Alert.alert("Invalid Code", "Please enter the connection code.");
-      return;
-    }
+const handleConnect = async () => {
+  if (!code.trim()) {
+    Alert.alert("Invalid Code", "Please enter the connection code.");
+    return;
+  }
 
-    Alert.alert(
-      "Connecting",
-      "Attempting to connect with your doctor..."
-    );
-  };
+  const session = await getSession();
+  if (!session?.id) {
+    Alert.alert("Error", "Patient session not found.");
+    return;
+  }
+
+  const result = await consumeConnectionCode(
+    code.trim().toUpperCase(),
+    session.id
+  );
+
+  if (!result) {
+    Alert.alert("Invalid Code", "This code is expired or incorrect.");
+    return;
+  }
+
+  Alert.alert("Connected", "Doctor connected successfully.", [
+    {
+      text: "OK",
+      onPress: () => router.replace("/patient"),
+    },
+  ]);
+};
+
 
   return (
     <View style={styles.container}>
