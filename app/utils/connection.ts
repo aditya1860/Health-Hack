@@ -23,7 +23,7 @@ export const saveConnectionCode = async (
 // consume code when patient connects
 export const consumeConnectionCode = async (
   code: string,
-  patientId: string
+  patientPhone: string
 ) => {
   const data = await AsyncStorage.getItem(CODES_KEY);
   const codes = data ? JSON.parse(data) : {};
@@ -31,14 +31,17 @@ export const consumeConnectionCode = async (
   const entry = codes[code];
   if (!entry) return null;
 
-  const { doctorId } = entry;
+  const { doctorPhone } = entry;
 
   // save doctor → patients
   const docData = await AsyncStorage.getItem(DOCTOR_CONNECTIONS);
   const connections = docData ? JSON.parse(docData) : {};
 
-  connections[doctorId] = connections[doctorId] || [];
-  connections[doctorId].push(patientId);
+  connections[doctorPhone] = connections[doctorPhone] || [];
+
+  if (!connections[doctorPhone].includes(patientPhone)) {
+    connections[doctorPhone].push(patientPhone);
+  }
 
   await AsyncStorage.setItem(
     DOCTOR_CONNECTIONS,
@@ -48,15 +51,19 @@ export const consumeConnectionCode = async (
   // save patient → doctor
   await AsyncStorage.setItem(
     PATIENT_CONNECTION,
-    JSON.stringify({ patientId, doctorId })
+    JSON.stringify({
+      patientPhone,
+      doctorPhone,
+    })
   );
 
   // remove used code
   delete codes[code];
   await AsyncStorage.setItem(CODES_KEY, JSON.stringify(codes));
 
-  return { doctorId };
+  return { doctorPhone };
 };
+
 // get all patients connected to a doctor
 export const getDoctorPatients = async (doctorId: string) => {
   const data = await AsyncStorage.getItem(DOCTOR_CONNECTIONS);

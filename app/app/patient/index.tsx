@@ -198,8 +198,8 @@ if (session && session.phone) {
         
         {doctor ? (
   <View style={{ padding: 16 }}>
-    <Text style={{ fontWeight: "600" }}>Connected Doctor</Text>
-    <Text>Doctor ID: {doctor.doctorId}</Text>
+    <Text style={{ fontWeight: "600" }}>You are connected to a Doctor</Text>
+    {/* <Text>Doctor ID: {doctor.doctorId}</Text> */}
   </View>
 ) : (
   <Text style={{ padding: 16, color: "#6B7280" }}>

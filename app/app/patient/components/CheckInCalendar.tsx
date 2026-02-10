@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet } from "react-native";
 import { useEffect, useState } from "react";
-import { getSession } from "../../../utils/storage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getSession } from "../../../utils/storage";
 
 export default function CheckInCalendar() {
   const [checkIns, setCheckIns] = useState<string[]>([]);
@@ -10,104 +10,91 @@ export default function CheckInCalendar() {
     loadCheckIns();
   }, []);
 
-const loadCheckIns = async () => {
-  try {
-    const session = await getSession();
-    if (!session || !session.phone) {
-      setCheckIns([]);
-      return;
-    }
+  const loadCheckIns = async () => {
+    try {
+      const session = await getSession();
+      if (!session?.phone) return;
 
-    const phone = session.phone;
-    const historyKey = `CHECKIN_HISTORY_${phone}`;
+      const historyKey = `CHECKIN_HISTORY_${session.phone}`;
+      const historyData = await AsyncStorage.getItem(historyKey);
 
-    const historyData = await AsyncStorage.getItem(historyKey);
-    if (historyData) {
+      if (!historyData) return;
+
       const history = JSON.parse(historyData);
-
-      const dates = history.map((item: any) => {
-        const date = new Date(item.timestamp);
-        return date.toISOString().split("T")[0];
-      });
+      const dates = history.map((item: any) =>
+        new Date(item.timestamp).toISOString().split("T")[0]
+      );
 
       setCheckIns(dates);
-    } else {
-      setCheckIns([]);
+    } catch (error) {
+      console.error("Error loading check-ins:", error);
     }
-  } catch (error) {
-    console.error("Error loading check-ins:", error);
-    setCheckIns([]);
-  }
-};
+  };
 
+  /* ---------- Date helpers ---------- */
 
-  // Get last 14 days
-  const getLast14Days = () => {
-    const days = [];
-    const today = new Date();
-    
-    for (let i = 13; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(today.getDate() - i);
-      days.push(date);
+  const getDateString = (date: Date) =>
+    date.toISOString().split("T")[0];
+
+  const isToday = (date: Date) =>
+    getDateString(date) === getDateString(new Date());
+
+  const isCheckedIn = (date: Date) =>
+    checkIns.includes(getDateString(date));
+
+  const getDaysInMonth = (year: number, month: number) => {
+    const days: Date[] = [];
+    const date = new Date(year, month, 1);
+
+    while (date.getMonth() === month) {
+      days.push(new Date(date));
+      date.setDate(date.getDate() + 1);
     }
-    
+
     return days;
   };
 
-  const formatDayLabel = (date: Date) => {
-    return date.toLocaleDateString("en-US", { weekday: "short" }).charAt(0);
-  };
+  /* ---------- Calendar data ---------- */
 
-  const getDateString = (date: Date) => {
-    return date.toISOString().split("T")[0];
-  };
+  const today = new Date();
+  const days = getDaysInMonth(today.getFullYear(), today.getMonth());
 
-  const hasCheckIn = (date: Date) => {
-    return checkIns.includes(getDateString(date));
-  };
-
-  const days = getLast14Days();
-  const streakCount = checkIns.length;
+  const weekdayLabels = ["S", "M", "T", "W", "T", "F", "S"];
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>14-Day Check-In Streak</Text>
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>{streakCount}/14</Text>
-        </View>
-      </View>
+      <Text style={styles.title}>
+        {today.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+      </Text>
 
-      {/* Day Labels */}
-      <View style={styles.dayLabelsRow}>
-        {days.map((date, index) => (
-          <View key={index} style={styles.dayLabelContainer}>
-            <Text style={styles.dayLabel}>{formatDayLabel(date)}</Text>
-          </View>
+      {/* Weekday headers */}
+      <View style={styles.weekdaysRow}>
+        {weekdayLabels.map((day, index) => (
+          <Text key={index} style={styles.weekday}>
+            {day}
+          </Text>
         ))}
       </View>
 
-      {/* Day Numbers and Status */}
-      <View style={styles.daysRow}>
+      {/* Calendar grid */}
+      <View style={styles.calendarGrid}>
         {days.map((date, index) => {
-          const isCheckedIn = hasCheckIn(date);
-          const isToday = getDateString(date) === getDateString(new Date());
-          
+          const todayFlag = isToday(date);
+          const checked = isCheckedIn(date);
+
           return (
-            <View key={index} style={styles.dayContainer}>
+            <View key={index} style={styles.dayCell}>
               <View
                 style={[
                   styles.dayCircle,
-                  isCheckedIn && styles.dayCircleChecked,
-                  isToday && styles.dayCircleToday,
+                  checked && styles.checkedDay,
+                  todayFlag && styles.todayDay,
                 ]}
               >
                 <Text
                   style={[
-                    styles.dayNumber,
-                    isCheckedIn && styles.dayNumberChecked,
-                    isToday && styles.dayNumberToday,
+                    styles.dayText,
+                    (checked || todayFlag) && styles.dayTextActive,
                   ]}
                 >
                   {date.getDate()}
@@ -117,15 +104,11 @@ const loadCheckIns = async () => {
           );
         })}
       </View>
-
-      <Text style={styles.subtitle}>
-        {streakCount < 14
-          ? `${14 - streakCount} more to complete your streak`
-          : "Streak complete! Great job! 🎉"}
-      </Text>
     </View>
   );
 }
+
+/* ---------- Styles ---------- */
 
 const styles = StyleSheet.create({
   container: {
@@ -133,106 +116,65 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 14,
     elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-  },
-
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 16,
   },
 
   title: {
-    fontSize: 17,
+    fontSize: 18,
     fontWeight: "700",
+    textAlign: "center",
+    marginBottom: 12,
     color: "#111827",
   },
 
-  badge: {
-    backgroundColor: "#DBEAFE",
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-
-  badgeText: {
-    color: "#1E40AF",
-    fontWeight: "700",
-    fontSize: 14,
-  },
-
-  dayLabelsRow: {
+  weekdaysRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
     marginBottom: 8,
   },
 
-  dayLabelContainer: {
-    width: 24,
-    alignItems: "center",
-  },
-
-  dayLabel: {
-    fontSize: 11,
+  weekday: {
+    width: "14.28%",
+    textAlign: "center",
+    fontSize: 12,
     fontWeight: "600",
     color: "#6B7280",
   },
 
-  daysRow: {
+  calendarGrid: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 12,
+    flexWrap: "wrap",
   },
 
-  dayContainer: {
-    width: 24,
+  dayCell: {
+    width: "14.28%",
     alignItems: "center",
+    marginBottom: 10,
   },
 
   dayCircle: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: "#F3F4F6",
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
   },
 
-  dayCircleChecked: {
-    backgroundColor: "#2563EB",
-    borderColor: "#2563EB",
+  checkedDay: {
+    backgroundColor: "#2563EB", // blue
   },
 
-  dayCircleToday: {
-    borderColor: "#2563EB",
-    borderWidth: 2,
+  todayDay: {
+    backgroundColor: "#16A34A", // green
   },
 
-  dayNumber: {
-    fontSize: 11,
-    fontWeight: "600",
-    color: "#9CA3AF",
-  },
-
-  dayNumberChecked: {
-    color: "#FFFFFF",
-  },
-
-  dayNumberToday: {
-    color: "#2563EB",
-    fontWeight: "700",
-  },
-
-  subtitle: {
+  dayText: {
     fontSize: 12,
     color: "#6B7280",
-    textAlign: "center",
-    fontStyle: "italic",
+    fontWeight: "600",
+  },
+
+  dayTextActive: {
+    color: "#FFFFFF",
+    fontWeight: "700",
   },
 });
