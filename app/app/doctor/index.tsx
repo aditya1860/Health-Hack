@@ -17,7 +17,7 @@ import CommonBackButton from "../../components/CommonBackButton";
 import { Image } from "react-native";
 import { router } from "expo-router";
 import AppHeader from "../../components/AppHeader";
-import { getDoctorPatients } from "../../utils/connections";
+import { getDoctorPatients } from "../../utils/connection";
 import { getSession } from "../../utils/storage";
 
 
@@ -103,8 +103,6 @@ const loadDoctor = async () => {
 </View>
         {/* Overview Cards */}
         <OverviewCards />
-
-        
 
         {connectedPatients.length === 0 ? (
   <Text style={{ margin: 16, color: "#6B7280" }}>

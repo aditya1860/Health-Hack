@@ -3,7 +3,7 @@ import { useState } from "react";
 import CommonBackButton from "../../components/CommonBackButton";
 import * as Clipboard from "expo-clipboard";
 import { getSession } from "../../utils/storage";
-import { saveConnectionCode } from "../../utils/connections";
+import { saveConnectionCode } from "../../utils/connection";
 
 
 export default function ConnectPatient() {
@@ -15,11 +15,15 @@ const generateCode = async () => {
     .substring(2, 8)
     .toUpperCase();
 
-  const session = await getSession();
-  if (!session?.id) {
-    Alert.alert("Error", "Doctor session not found.");
-    return;
-  }
+const session = await getSession();
+
+if (!session || session.role !== "doctor" || !session.phone) {
+  Alert.alert("Error", "Doctor session not found.");
+  return;
+}
+
+await saveConnectionCode(newCode, session.phone);
+
 
   await saveConnectionCode(newCode, session.id);
   setCode(newCode);

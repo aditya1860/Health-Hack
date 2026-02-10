@@ -7,13 +7,13 @@ const PATIENT_CONNECTION = "PATIENT_CONNECTION";
 // save generated code
 export const saveConnectionCode = async (
   code: string,
-  doctorId: string
+  doctorPhone: string
 ) => {
   const data = await AsyncStorage.getItem(CODES_KEY);
   const codes = data ? JSON.parse(data) : {};
 
   codes[code] = {
-    doctorId,
+    doctorPhone,
     createdAt: Date.now(),
   };
 

@@ -9,7 +9,7 @@ import {
 import { useState } from "react";
 import CommonBackButton from "../../components/CommonBackButton";
 import { getSession } from "../../utils/storage";
-import { consumeConnectionCode } from "../../utils/connections";
+import { consumeConnectionCode } from "../../utils/connection";
 import { router } from "expo-router";
 
 

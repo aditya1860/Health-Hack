@@ -16,7 +16,7 @@ import { useEmergency } from "../../context/EmergencyContext";
 import { getSession } from "../../utils/storage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AppHeader from "../../components/AppHeader";
-import { getPatientDoctor } from "../../utils/connections";
+import { getPatientDoctor } from "../../utils/connection";
 
 
 export default function PatientDashboard() {
