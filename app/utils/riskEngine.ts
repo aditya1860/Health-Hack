@@ -8,6 +8,15 @@ export type RiskInput = {
   missedMeds: boolean;
 };
 
+export type CheckInData = {
+  sugar: string;
+  heartRate: string;
+  bloodPressure: string;
+  oxygen: string;
+  feeling: string;
+};
+
+
 export function calculateRisk(data: RiskInput) {
   const {
     sys,
@@ -18,6 +27,8 @@ export function calculateRisk(data: RiskInput) {
     symptomsCount,
     missedMeds,
   } = data;
+
+  
 
   // HIGH RISK
   if (

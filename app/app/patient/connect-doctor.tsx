@@ -22,16 +22,18 @@ const handleConnect = async () => {
     return;
   }
 
-  const session = await getSession();
-  if (!session?.id) {
-    Alert.alert("Error", "Patient session not found.");
-    return;
-  }
+const session = await getSession();
 
-  const result = await consumeConnectionCode(
-    code.trim().toUpperCase(),
-    session.id
-  );
+if (!session || session.role !== "patient" || !session.phone) {
+  Alert.alert("Error", "Patient session not found.");
+  return;
+}
+
+const result = await consumeConnectionCode(
+  code.trim().toUpperCase(),
+  session.phone
+);
+
 
   if (!result) {
     Alert.alert("Invalid Code", "This code is expired or incorrect.");

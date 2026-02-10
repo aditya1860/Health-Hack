@@ -39,7 +39,6 @@ await saveConnectionCode(newCode, session.phone);
 
   return (
     <View style={styles.container}>
-      <CommonBackButton />
 
       <Text style={styles.title}>Connect Patient</Text>
       <Text style={styles.subtitle}>
@@ -55,6 +54,8 @@ await saveConnectionCode(newCode, session.phone);
           </TouchableOpacity>
         </>
       )}
+
+            <CommonBackButton />
 
       <TouchableOpacity style={styles.button} onPress={generateCode}>
         <Text style={styles.buttonText}>
