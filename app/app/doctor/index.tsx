@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -13,13 +13,47 @@ import PatientList from './PatientList';
 import Analytics from './analytics';
 import Emergencies from './emergencies';
 import CommonBackButton from "../../components/CommonBackButton";
+import { getSession } from "../../utils/storage";
 import { Image } from "react-native";
+import { router } from "expo-router";
 import AppHeader from "../../components/AppHeader";
+import { getDoctorPatients } from "../../utils/connections";
 
 
+const [connectedPatients, setConnectedPatients] = useState<string[]>([]);
 const DoctorDashboard = () => {
   const [activeTab, setActiveTab] = useState('Patient List');
   const tabs = ['Patient List', 'Recent Alerts', 'Risk Trends'];
+  const [doctorName, setDoctorName] = useState("Doctor");
+  const [specialization, setSpecialization] = useState("");
+
+  useEffect(() => {
+  loadDoctor();
+  loadPatients();
+}, []);
+
+const loadPatients = async () => {
+  const session = await getSession();
+  if (!session?.id) return;
+
+  const patients = await getDoctorPatients(session.id);
+  setConnectedPatients(patients);
+};
+
+
+  useEffect(() => {
+  loadDoctor();
+}, []);
+
+const loadDoctor = async () => {
+  const session = await getSession();
+
+  if (session?.role === "doctor") {
+    setDoctorName(session.name || "Doctor");
+    setSpecialization(session.specialization || "");
+  }
+};
+
 
   const renderContent = () => {
     switch (activeTab) {
@@ -35,35 +69,42 @@ const DoctorDashboard = () => {
   };
 
   return (
-
-      <View style={{ flex: 1 }}>
+  <View style={{ flex: 1 }}>
     <AppHeader
-      title="Dr. Rakesh Prasad"
-      subtitle="Clinical Physician"
+      title={doctorName}
+      subtitle={specialization}
     />
+    <View style={styles.actionBar}>
+  <TouchableOpacity
+    style={styles.connectButton}
+    onPress={() => router.push("/doctor/connect-patient")}
+  >
+    <Text style={styles.connectText}>+ Connect Patient</Text>
+  </TouchableOpacity>
+</View>
+
+
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       
-      {/* Header */}
-      <View style={styles.header}>
-
-      <View style={styles.logoWrapper}>
-        <Image
-          source={require("../../assets/images/carefast-logo.png")}
-          style={styles.logo}
-          resizeMode="contain"
-        />
-      </View>
-
-      <View style={styles.doctorInfo}>
-        <Text style={styles.doctorName}>Dr. Rakesh Prasad</Text>
-        <Text style={styles.doctorSpecialty}>Clinical Physician</Text>
-      </View>
-      </View>
-
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Overview Cards */}
         <OverviewCards />
+
+        
+
+        {connectedPatients.length === 0 ? (
+  <Text style={{ margin: 16, color: "#6B7280" }}>
+    No patients connected yet.
+  </Text>
+) : (
+  connectedPatients.map((id) => (
+    <View key={id} style={{ padding: 16 }}>
+      <Text>Patient ID: {id}</Text>
+    </View>
+  ))
+)}
+
 
         {/* Tabs */}
         <View style={styles.tabContainer}>
@@ -169,6 +210,30 @@ const styles = StyleSheet.create({
   logoWrapper: {
     alignItems: 'flex-start',
 },
+
+actionBar: {
+  backgroundColor: "#fff",
+  paddingHorizontal: 16,
+  paddingVertical: 10,
+  borderBottomWidth: 1,
+  borderBottomColor: "#E5E7EB",
+  alignItems: "flex-end",
+},
+
+connectButton: {
+  borderWidth: 1,
+  borderColor: "#2563EB",
+  paddingHorizontal: 12,
+  paddingVertical: 6,
+  borderRadius: 6,
+},
+
+connectText: {
+  color: "#2563EB",
+  fontSize: 13,
+  fontWeight: "600",
+},
+
 
 });
 

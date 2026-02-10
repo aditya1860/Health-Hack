@@ -16,11 +16,24 @@ import { useEmergency } from "../../context/EmergencyContext";
 import { getSession } from "../../utils/storage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AppHeader from "../../components/AppHeader";
+import { getPatientDoctor } from "utils/connections";
 
 
 
 
 export default function PatientDashboard() {
+
+  const [doctor, setDoctor] = useState<any>(null);
+
+useEffect(() => {
+  loadDoctor();
+}, []);
+
+const loadDoctor = async () => {
+  const data = await getPatientDoctor();
+  setDoctor(data);
+};
+
 
   const router = useRouter();
   const { width } = useWindowDimensions();
@@ -131,6 +144,15 @@ if (session && session.phone) {
   <View style={{ flex: 1 }}>
     <AppHeader title="Patient Dashboard" />
   
+  <View style={styles.actionBar}>
+  <TouchableOpacity
+    style={styles.connectButton}
+    onPress={() => router.push("/patient/connect-doctor")}
+  >
+    <Text style={styles.connectText}>+ Connect Doctor</Text>
+  </TouchableOpacity>
+</View>
+
     
     <ScrollView style={styles.container}>
       <View
@@ -176,6 +198,16 @@ if (session && session.phone) {
         </View>
 
         
+        {doctor ? (
+  <View style={{ padding: 16 }}>
+    <Text style={{ fontWeight: "600" }}>Connected Doctor</Text>
+    <Text>Doctor ID: {doctor.doctorId}</Text>
+  </View>
+) : (
+  <Text style={{ padding: 16, color: "#6B7280" }}>
+    No doctor connected yet.
+  </Text>
+)}
 
         {/* CHECK-IN CALENDAR */}
         <View style={styles.sectionSpacing}>
@@ -423,4 +455,28 @@ const styles = StyleSheet.create({
     color: "#78350F",
     lineHeight: 19,
   },
+
+  actionBar: {
+  backgroundColor: "#fff",
+  paddingHorizontal: 16,
+  paddingVertical: 10,
+  borderBottomWidth: 1,
+  borderBottomColor: "#E5E7EB",
+  alignItems: "flex-end",
+},
+
+connectButton: {
+  borderWidth: 1,
+  borderColor: "#2563EB",
+  paddingHorizontal: 12,
+  paddingVertical: 6,
+  borderRadius: 6,
+},
+
+connectText: {
+  color: "#2563EB",
+  fontSize: 13,
+  fontWeight: "600",
+},
+
 });
