@@ -1,27 +1,28 @@
 import React from "react";
 import { Pressable, Text, StyleSheet, Platform, View } from "react-native";
-import { router } from "expo-router";
+import { router, type Href } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface Props {
   color?: string;
   disabled?: boolean;
+  fallbackRoute?: Href;
 }
 
 export default function CommonBackButton({
   color = "#111827",
   disabled = false,
+  fallbackRoute = "/",
 }: Props) {
   const insets = useSafeAreaInsets();
 
-  const handleBack = () => {
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      router.replace("/");
-    }
-  };
-
+const handleBack = () => {
+  if (router.canGoBack()) {
+    router.back();
+  } else {
+    router.replace(fallbackRoute);
+  }
+};
   if (disabled) {
     return null;
   }
@@ -55,23 +56,19 @@ const styles = StyleSheet.create({
     left: 12,
     zIndex: 100,
   },
+
   container: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    backgroundColor: "#FFFFFF",
-    color: "#000000",
-    borderRadius: 8,
-    shadowColor: "#000",
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 4,
+    paddingHorizontal: 0,
+    paddingVertical: 4,
+    backgroundColor: "transparent",
   },
+
   pressed: {
-    opacity: 0.6,
+    opacity: 0.5,
   },
+
   text: {
-    fontSize: 16,
-    fontWeight: Platform.OS === "ios" ? "600" : "700",
+    fontSize: 17,
+    fontWeight: Platform.OS === "ios" ? "400" : "600",
   },
 });

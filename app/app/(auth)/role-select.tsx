@@ -1,6 +1,7 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { router } from "expo-router";
 import { useEmergency } from "../../context/EmergencyContext";
+import CommonBackButton from "components/CommonBackButton";
 
 export default function RoleSelect() {
   const { setRole } = useEmergency();
@@ -12,6 +13,8 @@ export default function RoleSelect() {
 
   return (
     <View style={styles.container}>
+
+      <CommonBackButton fallbackRoute="/onboarding" />
       {/* Background visuals */}
       <View style={styles.bgCircleOne} />
       <View style={styles.bgCircleTwo} />

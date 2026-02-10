@@ -10,7 +10,7 @@ import {
   KeyboardAvoidingView,
   ScrollView,
 } from 'react-native';
-
+import CommonBackButton from "../../components/CommonBackButton";
 import { router } from 'expo-router';
 import { addUser, setSession } from '../../utils/storage';
 
@@ -86,7 +86,11 @@ export default function DoctorSignup() {
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={{ flex: 1 }}
+      
     >
+<CommonBackButton fallbackRoute="/role-select" />
+
+      
       <ScrollView
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
@@ -94,6 +98,7 @@ export default function DoctorSignup() {
         {/* 🔴 Background blobs */}
         <View style={styles.blobTopLeft} />
         <View style={styles.blobBottomRight} />
+        
 
         <View style={styles.card}>
           <Text style={styles.title}>Doctor Signup</Text>

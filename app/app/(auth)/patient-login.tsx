@@ -18,6 +18,7 @@ import {
   ScrollView,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import CommonBackButton from 'components/CommonBackButton';
 
 const OTP = '1234';
 
@@ -96,6 +97,7 @@ export default function PatientLogin() {
           contentContainerStyle={styles.container}
           keyboardShouldPersistTaps="handled"
         >
+          <CommonBackButton fallbackRoute="/role-select" />
           <View style={styles.card}>
             <Text style={styles.title}>Patient Login</Text>
             <Text style={styles.subtitle}>

@@ -11,10 +11,13 @@ import CommonBackButton from "../../components/CommonBackButton";
 import { getSession } from "../../utils/storage";
 import { consumeConnectionCode } from "../../utils/connection";
 import { router } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 
 
 export default function ConnectDoctor() {
   const [code, setCode] = useState("");
+const insets = useSafeAreaInsets();
 
 const handleConnect = async () => {
   if (!code.trim()) {
@@ -50,9 +53,14 @@ const result = await consumeConnectionCode(
 
 
   return (
-    <View style={styles.container}>
-      <CommonBackButton />
-
+    
+<View
+  style={[
+    styles.container,
+    { paddingTop: insets.top + 56 },
+  ]}
+>
+      <CommonBackButton fallbackRoute="/patient" />
       <Text style={styles.title}>Connect Doctor</Text>
       <Text style={styles.subtitle}>
         Enter the code provided by your doctor.
@@ -83,7 +91,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: "700",
-    marginTop: 24,
   },
   subtitle: {
     color: "#6B7280",

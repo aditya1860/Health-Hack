@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { findUserByPhone, setSession } from '../../utils/storage';
+import CommonBackButton from 'components/CommonBackButton';
 
 const OTP = '1234';
 
@@ -76,6 +77,7 @@ export default function DoctorLogin() {
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
+        <CommonBackButton fallbackRoute="/role-select" />
         {/* 🔴 Background blobs */}
         <View style={styles.blobTopLeft} />
         <View style={styles.blobBottomRight} />
