@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
@@ -77,7 +76,7 @@ const loadDoctor = async () => {
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
               {/* <CommonBackButton /> */}
       
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+  <View style={styles.content}>
 
       <AppHeader
       title={doctorName}
@@ -140,7 +139,7 @@ const loadDoctor = async () => {
 
         {/* Content */}
         {renderContent()}
-      </ScrollView>
+      </View>
     </SafeAreaView>
     </View>
   );
