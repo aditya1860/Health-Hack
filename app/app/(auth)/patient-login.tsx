@@ -19,7 +19,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CommonBackButton from 'components/CommonBackButton';
-
+import { Image } from "react-native";
 const OTP = '1234';
 
 export default function PatientLogin() {
@@ -83,71 +83,7 @@ export default function PatientLogin() {
     router.replace('/');
   };
 
-  return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={{ flex: 1 }}
-    >
-      <View style={styles.wrapper}>
-        {/* 🔴 Background Blobs */}
-        <View style={styles.blobTopLeft} />
-        <View style={styles.blobBottomRight} />
-
-        <ScrollView
-          contentContainerStyle={styles.container}
-          keyboardShouldPersistTaps="handled"
-        >
-          <CommonBackButton fallbackRoute="/role-select" />
-          <View style={styles.card}>
-            <Text style={styles.title}>Patient Login</Text>
-            <Text style={styles.subtitle}>
-              We’ll send a one-time password to your phone
-            </Text>
-
-            {step === 1 && (
-              <>
-                <TextInput
-                  placeholder="+91 Mobile Number"
-                  placeholderTextColor="#9CA3AF"
-                  keyboardType="number-pad"
-                  value={phone}
-                  onChangeText={(t) => setPhone(t.replace(/[^0-9]/g, ''))}
-                  style={styles.input}
-                />
-                <Pressable style={styles.btn} onPress={sendOtp}>
-                  <Text style={styles.btnText}>Send OTP</Text>
-                </Pressable>
-              </>
-            )}
-
-            {step === 2 && (
-              <>
-                <TextInput
-                  placeholder="Enter OTP"
-                  placeholderTextColor="#9CA3AF"
-                  keyboardType="number-pad"
-                  value={otp}
-                  onChangeText={setOtp}
-                  style={styles.input}
-                />
-                <Pressable style={styles.btn} onPress={verifyOtp}>
-                  <Text style={styles.btnText}>Verify & Login</Text>
-                </Pressable>
-              </>
-            )}
-
-            <Pressable onPress={() => router.replace('/patient-signup')}>
-              <Text style={styles.link}>
-                New user? <Text style={styles.linkBold}>Create account</Text>
-              </Text>
-            </Pressable>
-          </View>
-        </ScrollView>
-      </View>
-    </KeyboardAvoidingView>
-  );
-}
-
+  
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
@@ -197,6 +133,17 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 16,
   },
+
+logo: {
+  position: "absolute",
+  top: 60,
+  right: 20,
+  width: 110,
+  height: 40,
+  resizeMode: "contain",
+  zIndex: 10,
+},
+
   btnText: {
     color: '#ffffff',
     textAlign: 'center',
@@ -235,3 +182,78 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
 });
+
+
+return (
+  <KeyboardAvoidingView
+    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    style={{ flex: 1 }}
+  >
+    <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
+
+      {/* 🔴 Background blobs */}
+      <View style={styles.blobTopLeft} />
+      <View style={styles.blobBottomRight} />
+
+      {/* 🔴 Logo */}
+      <Image
+        source={require("../../assets/images/carefast-logo.png")}
+        style={styles.logo}
+      />
+
+      <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+      >
+        <CommonBackButton fallbackRoute="/role-select" />
+
+        <View style={styles.card}>
+          <Text style={styles.title}>Patient Login</Text>
+          <Text style={styles.subtitle}>
+            We’ll send a one-time password to your phone
+          </Text>
+
+          {step === 1 && (
+            <>
+              <TextInput
+                placeholder="+91 Mobile Number"
+                placeholderTextColor="#9CA3AF"
+                keyboardType="number-pad"
+                value={phone}
+                onChangeText={(t) => setPhone(t.replace(/[^0-9]/g, ''))}
+                style={styles.input}
+              />
+              <Pressable style={styles.btn} onPress={sendOtp}>
+                <Text style={styles.btnText}>Send OTP</Text>
+              </Pressable>
+            </>
+          )}
+
+          {step === 2 && (
+            <>
+              <TextInput
+                placeholder="Enter OTP"
+                placeholderTextColor="#9CA3AF"
+                keyboardType="number-pad"
+                value={otp}
+                onChangeText={setOtp}
+                style={styles.input}
+              />
+              <Pressable style={styles.btn} onPress={verifyOtp}>
+                <Text style={styles.btnText}>Verify & Login</Text>
+              </Pressable>
+            </>
+          )}
+
+          <Pressable onPress={() => router.replace('/patient-signup')}>
+            <Text style={styles.link}>
+              New user? <Text style={styles.linkBold}>Create account</Text>
+            </Text>
+          </Pressable>
+        </View>
+
+      </ScrollView>
+    </View>
+  </KeyboardAvoidingView>
+);
+}

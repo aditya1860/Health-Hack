@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { router } from "expo-router";
-import { logout } from "../../../utils/storage";
+import { logout } from "../../utils/storage";
 
 export default function Header() {
   const handleLogout = async () => {

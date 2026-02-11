@@ -13,6 +13,8 @@ import {
 import { router } from 'expo-router';
 import { addUser, setSession } from '../../utils/storage';
 import CommonBackButton from 'components/CommonBackButton';
+import { Image } from "react-native";
+
 
 const OTP = '1234';
 
@@ -92,10 +94,15 @@ const patient = {
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
-        <CommonBackButton fallbackRoute="/role-select" />
-        {/* 🔴 Background blobs */}
-        <View style={styles.blobTopLeft} />
-        <View style={styles.blobBottomRight} />
+      <CommonBackButton fallbackRoute="/role-select" />
+
+      <View style={styles.blobTopLeft} />
+      <View style={styles.blobBottomRight} />
+
+      <Image
+        source={require("../../assets/images/carefast-logo.png")}
+        style={styles.logo}
+      />
 
         <View style={styles.card}>
           <Text style={styles.title}>Patient Signup</Text>
@@ -266,6 +273,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+
+    logo: {
+  position: "absolute",
+  top: 50,
+  right: 20,
+  width: 100,
+  height: 36,
+  resizeMode: "contain",
+  opacity: 1,
+  zIndex: 10
+},
   divider: {
     height: 1,
     backgroundColor: '#e5e7eb',

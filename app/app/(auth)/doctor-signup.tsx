@@ -13,6 +13,7 @@ import {
 import CommonBackButton from "../../components/CommonBackButton";
 import { router } from 'expo-router';
 import { addUser, setSession } from '../../utils/storage';
+import { Image } from "react-native";
 
 const OTP = '1234';
 
@@ -82,23 +83,151 @@ export default function DoctorSignup() {
     router.replace('/doctor');
   };
 
-  return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={{ flex: 1 }}
-      
-    >
-<CommonBackButton fallbackRoute="/role-select" />
 
-      
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  card: {
+    width: '100%',
+    maxWidth: 420,
+    padding: 28,
+    borderRadius: 18,
+    backgroundColor: '#ffffff',
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 20,
+    elevation: 6,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#dc2626',
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+
+logo: {
+  position: "absolute",
+  top: 60,
+  right: 20,
+  width: 110,
+  height: 40,
+  resizeMode: "contain",
+  zIndex: 10,
+},
+
+
+  input: {
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    borderRadius: 10,
+    padding: 14,
+    marginBottom: 16,
+    fontSize: 16,
+  },
+  btn: {
+    backgroundColor: '#dc2626',
+    paddingVertical: 14,
+    borderRadius: 12,
+    marginTop: 10,
+  },
+  btnText: {
+    color: '#ffffff',
+    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#e5e7eb',
+    marginVertical: 20,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 14,
+    color: '#111827',
+  },
+  label: {
+    fontSize: 14,
+    marginBottom: 8,
+    color: '#374151',
+  },
+  optionGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginBottom: 16,
+  },
+  pill: {
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    borderRadius: 999,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+  },
+  pillActive: {
+    backgroundColor: '#fee2e2',
+    borderColor: '#dc2626',
+  },
+  pillText: {
+    fontSize: 13,
+    color: '#374151',
+  },
+  pillTextActive: {
+    color: '#dc2626',
+    fontWeight: '600',
+  },
+
+  /* 🔴 Background blobs */
+  blobTopLeft: {
+    position: 'absolute',
+    width: 240,
+    height: 240,
+    backgroundColor: '#fecaca',
+    borderRadius: 240,
+    top: -100,
+    left: -100,
+  },
+  blobBottomRight: {
+    position: 'absolute',
+    width: 280,
+    height: 280,
+    backgroundColor: '#fee2e2',
+    borderRadius: 280,
+    bottom: -120,
+    right: -120,
+  },
+});
+
+
+return (
+  <KeyboardAvoidingView
+    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    style={{ flex: 1 }}
+  >
+    <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
+
+      {/* 🔴 Background blobs */}
+      <View style={styles.blobTopLeft} />
+      <View style={styles.blobBottomRight} />
+
+      {/* 🔴 Logo */}
+      <Image
+        source={require("../../assets/images/carefast-logo.png")}
+        style={styles.logo}
+      />
+
       <ScrollView
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
-        {/* 🔴 Background blobs */}
-        <View style={styles.blobTopLeft} />
-        <View style={styles.blobBottomRight} />
-        
+        <CommonBackButton fallbackRoute="/role-select" />
 
         <View style={styles.card}>
           <Text style={styles.title}>Doctor Signup</Text>
@@ -207,116 +336,9 @@ export default function DoctorSignup() {
             </>
           )}
         </View>
+
       </ScrollView>
-    </KeyboardAvoidingView>
-  );
+    </View>
+  </KeyboardAvoidingView>
+);
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  card: {
-    width: '100%',
-    maxWidth: 420,
-    padding: 28,
-    borderRadius: 18,
-    backgroundColor: '#ffffff',
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 20,
-    elevation: 6,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#dc2626',
-    textAlign: 'center',
-    marginBottom: 24,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
-    borderRadius: 10,
-    padding: 14,
-    marginBottom: 16,
-    fontSize: 16,
-  },
-  btn: {
-    backgroundColor: '#dc2626',
-    paddingVertical: 14,
-    borderRadius: 12,
-    marginTop: 10,
-  },
-  btnText: {
-    color: '#ffffff',
-    textAlign: 'center',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#e5e7eb',
-    marginVertical: 20,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 14,
-    color: '#111827',
-  },
-  label: {
-    fontSize: 14,
-    marginBottom: 8,
-    color: '#374151',
-  },
-  optionGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-    marginBottom: 16,
-  },
-  pill: {
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
-    borderRadius: 999,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-  },
-  pillActive: {
-    backgroundColor: '#fee2e2',
-    borderColor: '#dc2626',
-  },
-  pillText: {
-    fontSize: 13,
-    color: '#374151',
-  },
-  pillTextActive: {
-    color: '#dc2626',
-    fontWeight: '600',
-  },
-
-  /* 🔴 Background blobs */
-  blobTopLeft: {
-    position: 'absolute',
-    width: 240,
-    height: 240,
-    backgroundColor: '#fecaca',
-    borderRadius: 240,
-    top: -100,
-    left: -100,
-  },
-  blobBottomRight: {
-    position: 'absolute',
-    width: 280,
-    height: 280,
-    backgroundColor: '#fee2e2',
-    borderRadius: 280,
-    bottom: -120,
-    right: -120,
-  },
-});

@@ -14,6 +14,7 @@ import {
 import { router } from 'expo-router';
 import { findUserByPhone, setSession } from '../../utils/storage';
 import CommonBackButton from 'components/CommonBackButton';
+import { Image } from "react-native";
 
 const OTP = '1234';
 
@@ -68,63 +69,7 @@ export default function DoctorLogin() {
     router.replace('/');
   };
 
-  return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={{ flex: 1 }}
-    >
-      <ScrollView
-        contentContainerStyle={styles.container}
-        keyboardShouldPersistTaps="handled"
-      >
-        <CommonBackButton fallbackRoute="/role-select" />
-        {/* 🔴 Background blobs */}
-        <View style={styles.blobTopLeft} />
-        <View style={styles.blobBottomRight} />
-
-        <View style={styles.card}>
-          <Text style={styles.title}>Doctor Login</Text>
-          <Text style={styles.subtitle}>
-            We’ll send a one-time password to your phone
-          </Text>
-
-          {step === 1 && (
-            <>
-              <TextInput
-                placeholder="+91 Mobile Number"
-                keyboardType="number-pad"
-                placeholderTextColor="#9CA3AF"
-                value={phone}
-                onChangeText={(t) => setPhone(t.replace(/[^0-9]/g, ''))}
-                style={styles.input}
-              />
-              <Pressable style={styles.btn} onPress={sendOtp}>
-                <Text style={styles.btnText}>Send OTP</Text>
-              </Pressable>
-            </>
-          )}
-
-          {step === 2 && (
-            <>
-              <TextInput
-                placeholder="Enter OTP"
-                keyboardType="number-pad"
-                placeholderTextColor="#9CA3AF"
-                value={otp}
-                onChangeText={setOtp}
-                style={styles.input}
-              />
-              <Pressable style={styles.btn} onPress={verifyOtp}>
-                <Text style={styles.btnText}>Verify & Login</Text>
-              </Pressable>
-            </>
-          )}
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
-  );
-}
-
+  
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -171,6 +116,17 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 16,
   },
+
+logo: {
+  position: "absolute",
+  top: 60,
+  right: 20,
+  width: 110,
+  height: 40,
+  resizeMode: "contain",
+  zIndex: 10,
+},
+
   btnText: {
     color: '#ffffff',
     textAlign: 'center',
@@ -198,3 +154,72 @@ const styles = StyleSheet.create({
     right: -110,
   },
 });
+
+
+return (
+  <KeyboardAvoidingView
+    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    style={{ flex: 1 }}
+  >
+    <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
+
+      {/* 🔴 Background blobs */}
+      <View style={styles.blobTopLeft} />
+      <View style={styles.blobBottomRight} />
+
+      {/* 🔴 Logo */}
+      <Image
+        source={require("../../assets/images/carefast-logo.png")}
+        style={styles.logo}
+      />
+
+      <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+      >
+        <CommonBackButton fallbackRoute="/role-select" />
+
+        <View style={styles.card}>
+          <Text style={styles.title}>Doctor Login</Text>
+          <Text style={styles.subtitle}>
+            We’ll send a one-time password to your phone
+          </Text>
+
+          {step === 1 && (
+            <>
+              <TextInput
+                placeholder="+91 Mobile Number"
+                keyboardType="number-pad"
+                placeholderTextColor="#9CA3AF"
+                value={phone}
+                onChangeText={(t) => setPhone(t.replace(/[^0-9]/g, ''))}
+                style={styles.input}
+              />
+              <Pressable style={styles.btn} onPress={sendOtp}>
+                <Text style={styles.btnText}>Send OTP</Text>
+              </Pressable>
+            </>
+          )}
+
+          {step === 2 && (
+            <>
+              <TextInput
+                placeholder="Enter OTP"
+                keyboardType="number-pad"
+                placeholderTextColor="#9CA3AF"
+                value={otp}
+                onChangeText={setOtp}
+                style={styles.input}
+              />
+              <Pressable style={styles.btn} onPress={verifyOtp}>
+                <Text style={styles.btnText}>Verify & Login</Text>
+              </Pressable>
+            </>
+          )}
+        </View>
+
+      </ScrollView>
+    </View>
+  </KeyboardAvoidingView>
+);
+}

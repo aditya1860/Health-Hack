@@ -14,11 +14,10 @@ import { useState, useEffect } from "react";
 import { useRouter, useNavigation } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NumberStepperInput from "../../components/NumberStepperInput";
-import SymptomCheckbox from "./components/SymptomCheckbox";
+import SymptomCheckbox from "../../components/patient-page/SymptomCheckbox";
 import { calculateRisk } from "../../utils/riskEngine";
 import { getSession } from "../../utils/storage";
 import Slider from "@react-native-community/slider";
-import CommonBackButton from "components/CommonBackButton";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -58,20 +57,6 @@ const { top } = useSafeAreaInsets();
 
 
   /* ---------------- NAVBAR LOGO ---------------- */
-
-useEffect(() => {
-  navigation.setOptions({
-    headerLeft: () => (
-      <CommonBackButton fallbackRoute="/patient" />
-    ),
-    headerRight: () => (
-      <Image
-        source={require("../../assets/images/carefast-logo.png")}
-        style={{ width: 36, height: 36, marginRight: 10 }}
-      />
-    ),
-  });
-}, []);
 
 useEffect(() => {
   const loadVitals = async () => {

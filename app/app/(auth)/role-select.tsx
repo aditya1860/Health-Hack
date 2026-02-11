@@ -2,6 +2,8 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 import { router } from "expo-router";
 import { useEmergency } from "../../context/EmergencyContext";
 import CommonBackButton from "components/CommonBackButton";
+import { Image } from "react-native";
+
 
 export default function RoleSelect() {
   const { setRole } = useEmergency();
@@ -12,9 +14,14 @@ export default function RoleSelect() {
   };
 
   return (
-    <View style={styles.container}>
+<View style={styles.container}>
 
-      <CommonBackButton fallbackRoute="/onboarding" />
+  <CommonBackButton fallbackRoute="/onboarding" />
+
+  <Image
+    source={require("../../assets/images/carefast-logo.png")}
+    style={styles.logo}
+  />
       {/* Background visuals */}
       <View style={styles.bgCircleOne} />
       <View style={styles.bgCircleTwo} />
@@ -108,7 +115,20 @@ const styles = StyleSheet.create({
   /* Header */
   header: {
     alignItems: "center",
+    marginTop: 40,
   },
+
+  logo: {
+  position: "absolute",
+  top: 50,
+  right: 20,
+  width: 100,
+  height: 36,
+  resizeMode: "contain",
+  opacity: 1,
+  zIndex: 10
+},
+
   brand: {
     fontSize: 36,
     fontWeight: "800",

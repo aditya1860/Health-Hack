@@ -5,6 +5,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getSession } from "../../utils/storage";
 import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
+
 
 
 interface EmergencyProtocolProps {
@@ -132,7 +134,14 @@ export default function EmergencyProtocol({ emergencyType, onBack }: EmergencyPr
 
   const insets = useSafeAreaInsets();
 
-  
+  const navigation = useNavigation();
+
+useEffect(() => {
+  navigation.setOptions({
+    gestureEnabled: false,   // disables swipe back
+    headerBackVisible: false // hides back arrow if shown
+  });
+}, [navigation]);
 
   useEffect(() => {
     const interval = setInterval(() => {

@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet } from "react-native";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getSession } from "../../../utils/storage";
+import { getSession } from "../../utils/storage";
 
 export default function CheckInCalendar() {
   const [checkIns, setCheckIns] = useState<string[]>([]);

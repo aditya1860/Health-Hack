@@ -9,9 +9,9 @@ import {
 } from "react-native";
 import { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
-import StatusCard from "./components/StatusCard";
-import EmergencyCard from "./components/EmergencyCard";
-import CheckInCalendar from "./components/CheckInCalendar";
+import StatusCard from "../../components/patient-page/StatusCard";
+import EmergencyCard from "../../components/patient-page/EmergencyCard";
+import CheckInCalendar from "../../components/patient-page/CheckInCalendar";
 import { useEmergency } from "../../context/EmergencyContext";
 import { getSession } from "../../utils/storage";
 import AsyncStorage from "@react-native-async-storage/async-storage";

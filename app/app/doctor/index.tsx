@@ -12,8 +12,6 @@ import OverviewCards from './OverviewCards';
 import PatientList from './PatientList';
 import Analytics from './analytics';
 import Emergencies from './emergencies';
-import CommonBackButton from "../../components/CommonBackButton";
-import { Image } from "react-native";
 import { router } from "expo-router";
 import AppHeader from "../../components/AppHeader";
 import { getDoctorPatients } from "../../utils/connection";
