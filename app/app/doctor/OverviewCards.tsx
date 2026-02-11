@@ -43,15 +43,17 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
   },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginRight: 12,
-    width: 140,              // Changed from minWidth to width
-    maxWidth: 140,           // Added for extra constraint
-    borderWidth: 1,
-  },
+card: {
+  backgroundColor: '#fff',
+  borderRadius: 12,
+  padding: 16,
+  marginRight: 12,
+  width: 140,
+  height: 110,      // ✅ add this
+  borderWidth: 1,
+  justifyContent: 'center',  // ✅ center vertically
+},
+
   value: {
     fontSize: 22,
     fontWeight: '700',

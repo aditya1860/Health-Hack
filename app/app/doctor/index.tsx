@@ -102,11 +102,13 @@ const loadDoctor = async () => {
 </TouchableOpacity>
 
 </View>
-        {/* Overview Cards */}
-        <OverviewCards />
+{/* Overview Cards */}
+<View style={{ marginBottom: 8 }}>
+  <OverviewCards />
+</View>
 
-        {connectedPatients.length === 0 ? (
-  <Text style={{ margin: 16, color: "#6B7280" }}>
+{connectedPatients.length === 0 ? (
+  <Text style={{ marginHorizontal: 16, marginTop: 6, color: "#6B7280" }}>
     No patients connected yet.
   </Text>
 ) : (
