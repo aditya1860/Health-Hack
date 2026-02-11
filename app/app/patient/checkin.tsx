@@ -316,39 +316,35 @@ if (
     </Text>
 
     <View style={styles.bpWrapper}>
-      ...
+      <View style={styles.bpBox}>
+        <Text style={styles.bpLabel}>SYS</Text>
+        <TextInput
+          style={styles.bpInput}
+          placeholder="120"
+          placeholderTextColor="#9CA3AF"
+          keyboardType="numeric"
+          value={sys}
+          onChangeText={setSys}
+        />
+      </View>
+
+      <Text style={styles.bpSlash}>/</Text>
+
+      <View style={styles.bpBox}>
+        <Text style={styles.bpLabel}>DIA</Text>
+        <TextInput
+          style={styles.bpInput}
+          placeholder="80"
+          placeholderTextColor="#9CA3AF"
+          keyboardType="numeric"
+          value={dia}
+          onChangeText={setDia}
+        />
+      </View>
     </View>
   </>
 )}
 
-
-      <View style={styles.bpWrapper}>
-        <View style={styles.bpBox}>
-          <Text style={styles.bpLabel}>SYS</Text>
-          <TextInput
-            style={styles.bpInput}
-            placeholderTextColor="#9CA3AF"
-            placeholder="120"
-            keyboardType="numeric"
-            value={sys}
-            onChangeText={setSys}
-          />
-        </View>
-
-        <Text style={styles.bpSlash}>/</Text>
-
-        <View style={styles.bpBox}>
-          <Text style={styles.bpLabel}>DIA</Text>
-          <TextInput
-            style={styles.bpInput}
-            placeholder="80"
-            placeholderTextColor="#9CA3AF"
-            keyboardType="numeric"
-            value={dia}
-            onChangeText={setDia}
-          />
-        </View>
-      </View>
 
       {/* OTHER VITALS */}
 {monitoredVitals.includes("Heart Rate") && (
