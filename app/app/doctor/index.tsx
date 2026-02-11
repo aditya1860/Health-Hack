@@ -16,6 +16,9 @@ import { router } from "expo-router";
 import AppHeader from "../../components/AppHeader";
 import { getDoctorPatients } from "../../utils/connection";
 import { getSession } from "../../utils/storage";
+import { generateCode } from "../services/api";
+
+
 
 
 const DoctorDashboard = () => {
@@ -30,6 +33,15 @@ useEffect(() => {
   loadPatients();
 }, []);
 
+
+const handleGenerateCode = async () => {
+  try {
+    const response = await generateCode("doctor1", "Dr. Sharma");
+    alert("Connect Code: " + response.code);
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 const loadPatients = async () => {
   const session = await getSession();

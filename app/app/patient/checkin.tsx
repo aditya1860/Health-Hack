@@ -171,15 +171,16 @@ if (
     setLoading(true);
 
     try {
-    const input = {
-      sys: monitoredVitals.includes("Blood Pressure") ? Number(sys) : null,
-      dia: monitoredVitals.includes("Blood Pressure") ? Number(dia) : null,
-      hr: monitoredVitals.includes("Heart Rate") ? Number(hr) : null,
-      sugar: monitoredVitals.includes("Blood Sugar") ? Number(sugar) : null,
-      spo2: monitoredVitals.includes("Oxygen") ? Number(oxygen) : null,
-      symptomsCount: symptoms.length,
-      missedMeds,
-    };
+const input = {
+  sys: monitoredVitals.includes("Blood Pressure") ? Number(sys) : null,
+  dia: monitoredVitals.includes("Blood Pressure") ? Number(dia) : null,
+  hr: monitoredVitals.includes("Heart Rate") ? Number(hr) : null,
+  sugar: monitoredVitals.includes("Blood Sugar") ? Number(sugar) : null,
+  spo2: Number(oxygen), 
+  symptomsCount: symptoms.length,
+  missedMeds,
+};
+
 
 
       const risk = calculateRisk(input);
@@ -242,6 +243,13 @@ if (
 
   return (
 <View style={{ flex: 1, backgroundColor: "#F3F4F6" }}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.replace("/patient")}
+          accessibilityLabel="Back to patient dashboard"
+        >
+          <Text style={{ color: "#2563EB", fontWeight: "600" }}>Back</Text>
+        </TouchableOpacity>
 
 <ScrollView
   contentContainerStyle={{

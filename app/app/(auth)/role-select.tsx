@@ -5,6 +5,9 @@ import CommonBackButton from "components/CommonBackButton";
 import { Image } from "react-native";
 
 
+import { useEffect } from "react";
+
+
 export default function RoleSelect() {
   const { setRole } = useEmergency();
 

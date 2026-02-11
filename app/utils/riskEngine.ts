@@ -8,7 +8,6 @@ export type RiskInput = {
   missedMeds: boolean;
 };
 
-
 export type CheckInData = {
   sugar: string;
   heartRate: string;
@@ -17,7 +16,46 @@ export type CheckInData = {
   feeling: string;
 };
 
+/* ---------------- VITAL RULE CONFIG ---------------- */
 
+type VitalRule = {
+  medium: number;
+  high: number;
+  label: string;
+  reverse?: boolean;
+};
+
+const vitalRules: Record<string, VitalRule> = {
+  sys: {
+    medium: 140,
+    high: 180,
+    label: "High systolic pressure",
+  },
+  dia: {
+    medium: 90,
+    high: 120,
+    label: "High diastolic pressure",
+  },
+  hr: {
+    medium: 100,
+    high: 130,
+    label: "Elevated heart rate",
+  },
+  spo2: {
+    medium: 95,
+    high: 90,
+    label: "Low oxygen level",
+    reverse: true,
+  },
+  sugar: {
+    medium: 180,
+    high: 300,
+    label: "High blood sugar",
+  },
+};
+
+
+/* ---------------- MAPPER ---------------- */
 
 export function mapCheckInToRiskInput(
   checkIn: CheckInData
@@ -38,82 +76,80 @@ export function mapCheckInToRiskInput(
     dia,
     hr: checkIn.heartRate ? Number(checkIn.heartRate) : null,
     sugar: checkIn.sugar ? Number(checkIn.sugar) : null,
-    spo2: checkIn.oxygen ? Number(checkIn.oxygen) : null,
+    spo2: checkIn.oxygen ? parseFloat(checkIn.oxygen) : null,
     symptomsCount: checkIn.feeling ? 1 : 0,
     missedMeds: false,
   };
 }
 
+/* ---------------- CALCULATE RISK ---------------- */
 
 export function calculateRisk(data: RiskInput) {
-  const {
-    sys,
-    dia,
-    hr,
-    sugar,
-    spo2,
-    symptomsCount,
-    missedMeds,
-  } = data;
+  let reasons: string[] = [];
+  let mediumCount = 0;
+  let highTriggered = false;
 
-  /* ---------------- HIGH RISK ---------------- */
+  Object.entries(vitalRules).forEach(([key, rule]) => {
+    const value = (data as any)[key];
 
-  if (
-    (sys != null && sys >= thresholds.bp.highSys) ||
-    (dia != null && dia >= thresholds.bp.highDia) ||
-    (hr != null && hr >= thresholds.hr.high) ||
-    (spo2 != null && spo2 < thresholds.spo2.high) ||
-    symptomsCount >= 3
-  ) {
+    if (value == null) return;
+
+    if (rule.reverse) {
+      if (value < rule.high) {
+        highTriggered = true;
+        reasons.push(rule.label);
+      } else if (value < rule.medium) {
+        mediumCount++;
+      }
+    } else {
+      // Higher is worse
+      if (value >= rule.high) {
+        highTriggered = true;
+        reasons.push(rule.label);
+      } else if (value >= rule.medium) {
+        mediumCount++;
+      }
+    }
+  });
+
+  /* ---------- SYMPTOMS & MEDS ---------- */
+
+  if (data.symptomsCount >= 3) {
+    highTriggered = true;
+    reasons.push("Multiple severe symptoms");
+  }
+
+  if (data.missedMeds) {
+    mediumCount++;
+  }
+
+  /* ---------- FINAL DECISION ---------- */
+
+  if (highTriggered) {
     return {
       level: "High" as const,
-      reason:
-        "Critical vitals or multiple severe symptoms detected",
+      reason: reasons.length
+        ? reasons.join(", ")
+        : "Critical vitals detected",
     };
   }
 
-  /* ---------------- MEDIUM RISK ---------------- */
-
-  if (
-    (sys != null && sys >= thresholds.bp.mediumSys) ||
-    (dia != null && dia >= thresholds.bp.mediumDia) ||
-    (hr != null && hr >= thresholds.hr.medium) ||
-    (spo2 != null && spo2 < thresholds.spo2.medium) ||
-    (sugar != null && sugar >= thresholds.sugar.medium) ||
-    missedMeds
-  ) {
+  if (mediumCount >= 2) {
     return {
       level: "Medium" as const,
-      reason:
-        "Vitals outside normal range or medication missed",
+      reason: "Multiple abnormal indicators detected",
     };
   }
 
-  /* ---------------- LOW RISK ---------------- */
+  if (mediumCount === 1) {
+    return {
+      level: "Medium" as const,
+      reason: "One vital outside normal range",
+    };
+  }
 
   return {
     level: "Low" as const,
     reason: "Vitals are within safe limits",
   };
 }
-
-const thresholds = {
-  bp: {
-    highSys: 180,
-    highDia: 120,
-    mediumSys: 140,
-    mediumDia: 90,
-  },
-  hr: {
-    high: 130,
-    medium: 100,
-  },
-  spo2: {
-    high: 90,
-    medium: 95,
-  },
-  sugar: {
-    medium: 180,
-  },
-};
-

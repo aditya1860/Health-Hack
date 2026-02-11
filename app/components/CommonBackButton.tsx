@@ -58,6 +58,8 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 12,
     zIndex: 100,
+    marginTop: 6,
+
   },
 
   container: {

@@ -3,33 +3,34 @@ import { useState } from "react";
 import CommonBackButton from "../../components/CommonBackButton";
 import * as Clipboard from "expo-clipboard";
 import { getSession } from "../../utils/storage";
-import { saveConnectionCode } from "../../utils/connection";
-
+import { generateCode as generateBackendCode } from "../services/api";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ConnectPatient() {
   const [code, setCode] = useState<string | null>(null);
 
-const generateCode = async () => {
-  const newCode = Math.random()
-    .toString(36)
-    .substring(2, 8)
-    .toUpperCase();
+  const generateCode = async () => {
+    try {
+      const session = await getSession();
 
-const session = await getSession();
+      if (!session || session.role !== "doctor" || !session.phone) {
+        Alert.alert("Error", "Doctor session not found.");
+        return;
+      }
 
-if (!session || session.role !== "doctor" || !session.phone) {
-  Alert.alert("Error", "Doctor session not found.");
-  return;
-}
+      const response = await generateBackendCode(
+        session.phone,
+        session.name || "Doctor"
+      );
 
-await saveConnectionCode(newCode, session.phone);
+      setCode(response.code);
 
-
-  await saveConnectionCode(newCode, session.id);
-  setCode(newCode);
-
-  Alert.alert("Code Generated", "Share this code with the patient.");
-};
+      Alert.alert("Code Generated", "Share this code with the patient.");
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Error", "Failed to generate code.");
+    }
+  };
 
   const copyCode = async () => {
     if (!code) return;
@@ -37,34 +38,7 @@ await saveConnectionCode(newCode, session.phone);
     Alert.alert("Copied", "Code copied to clipboard.");
   };
 
-  return (
-    <View style={styles.container}>
 
-      <Text style={styles.title}>Connect Patient</Text>
-      <Text style={styles.subtitle}>
-        Generate a code and share it with your patient.
-      </Text>
-
-      {code && (
-        <>
-          <Text style={styles.code}>{code}</Text>
-
-          <TouchableOpacity style={styles.secondaryButton} onPress={copyCode}>
-            <Text style={styles.secondaryText}>Copy Code</Text>
-          </TouchableOpacity>
-        </>
-      )}
-
-            <CommonBackButton />
-
-      <TouchableOpacity style={styles.button} onPress={generateCode}>
-        <Text style={styles.buttonText}>
-          {code ? "Generate New Code" : "Generate Code"}
-        </Text>
-      </TouchableOpacity>
-    </View>
-  );
-}
 
 const styles = StyleSheet.create({
   container: {
@@ -73,13 +47,15 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   title: {
-    fontSize: 22,
-    fontWeight: "700",
-    marginTop: 24,
+  fontSize: 24,
+  fontWeight: "700",
+  marginTop: 55,
   },
+
   subtitle: {
-    color: "#6B7280",
-    marginTop: 8,
+  color: "#6B7280",
+  marginTop: 6,
+  marginBottom: 24,
   },
   code: {
     fontSize: 32,
@@ -114,4 +90,38 @@ secondaryText: {
   fontWeight: "600",
 },
 
+
 });
+
+
+return (
+  <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+    <View style={{ paddingHorizontal: 24, flex: 1 }}>
+
+      <CommonBackButton />
+
+      <Text style={styles.title}>Connect Patient</Text>
+      <Text style={styles.subtitle}>
+        Generate a code and share it with your patient.
+      </Text>
+
+      {code && (
+        <>
+          <Text style={styles.code}>{code}</Text>
+
+          <TouchableOpacity style={styles.secondaryButton} onPress={copyCode}>
+            <Text style={styles.secondaryText}>Copy Code</Text>
+          </TouchableOpacity>
+        </>
+      )}
+
+      <TouchableOpacity style={styles.button} onPress={generateCode}>
+        <Text style={styles.buttonText}>
+          {code ? "Generate New Code" : "Generate Code"}
+        </Text>
+      </TouchableOpacity>
+
+    </View>
+  </SafeAreaView>
+);
+}
