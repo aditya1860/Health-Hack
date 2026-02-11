@@ -40,6 +40,8 @@ export default function CheckIn() {
   const [hr, setHr] = useState(72);
   const [sugar, setSugar] = useState(100);
   const [oxygen, setOxygen] = useState(98);
+  const [monitoredVitals, setMonitoredVitals] = useState<string[]>([]);
+
 
   const [missedMeds, setMissedMeds] =
     useState(false);
@@ -69,6 +71,17 @@ useEffect(() => {
       />
     ),
   });
+}, []);
+
+useEffect(() => {
+  const loadVitals = async () => {
+    const session = await getSession();
+    if (session?.monitoredVitals) {
+      setMonitoredVitals(session.monitoredVitals);
+    }
+  };
+
+  loadVitals();
 }, []);
 
 
@@ -157,28 +170,32 @@ useEffect(() => {
   /* ---------------- CALCULATE RISK ---------------- */
 
   const handleCalculateRisk = async () => {
-    if (!sys || !dia || !hr || !sugar || !oxygen) {
-      Alert.alert(
-        "Missing data",
-        "Please fill all vital signs"
-      );
-      return;
-    }
+if (
+  (monitoredVitals.includes("Blood Pressure") && (!sys || !dia)) ||
+  (monitoredVitals.includes("Heart Rate") && !hr) ||
+  (monitoredVitals.includes("Blood Sugar") && !sugar) ||
+  (monitoredVitals.includes("Oxygen") && !oxygen)
+) {
+  Alert.alert("Missing data", "Please fill required vitals");
+  return;
+}
+
 
     if (!validateVitals()) return;
 
     setLoading(true);
 
     try {
-      const input = {
-        sys: Number(sys),
-        dia: Number(dia),
-        hr: Number(hr),
-        sugar: Number(sugar),
-        spo2: Number(oxygen),
-        symptomsCount: symptoms.length,
-        missedMeds,
-      };
+    const input = {
+      sys: monitoredVitals.includes("Blood Pressure") ? Number(sys) : null,
+      dia: monitoredVitals.includes("Blood Pressure") ? Number(dia) : null,
+      hr: monitoredVitals.includes("Heart Rate") ? Number(hr) : null,
+      sugar: monitoredVitals.includes("Blood Sugar") ? Number(sugar) : null,
+      spo2: monitoredVitals.includes("Oxygen") ? Number(oxygen) : null,
+      symptomsCount: symptoms.length,
+      missedMeds,
+    };
+
 
       const risk = calculateRisk(input);
 
@@ -292,9 +309,18 @@ useEffect(() => {
 
 
       {/* BP SECTION */}
-      <Text style={styles.section}>
-        Blood Pressure (BP)
-      </Text>
+{monitoredVitals.includes("Blood Pressure") && (
+  <>
+    <Text style={styles.section}>
+      Blood Pressure (BP)
+    </Text>
+
+    <View style={styles.bpWrapper}>
+      ...
+    </View>
+  </>
+)}
+
 
       <View style={styles.bpWrapper}>
         <View style={styles.bpBox}>
@@ -325,27 +351,29 @@ useEffect(() => {
       </View>
 
       {/* OTHER VITALS */}
-    <NumberStepperInput
-      label="Heart Rate"
-      value={hr}
-      onChange={setHr}
-      step={1}
-      unit="bpm"
-      min={30}
-      max={200}
-      helperText="Normal resting rate: 60–100 bpm"
-    />
+{monitoredVitals.includes("Heart Rate") && (
+  <NumberStepperInput
+    label="Heart Rate"
+    value={hr}
+    onChange={setHr}
+    step={1}
+    unit="bpm"
+    min={30}
+    max={200}
+  />
+)}
 
-    <NumberStepperInput
-      label="Blood Sugar"
-      value={sugar}
-      onChange={setSugar}
-      step={5}
-      unit="mg/dL"
-      min={40}
-      max={500}
-      helperText="Normal fasting range: 70–100"
-    />
+{monitoredVitals.includes("Blood Sugar") && (
+  <NumberStepperInput
+    label="Blood Sugar"
+    value={sugar}
+    onChange={setSugar}
+    step={5}
+    unit="mg/dL"
+    min={40}
+    max={500}
+  />
+)}
 
 
 <Text style={styles.section}>Oxygen Level (SpO₂)</Text>

@@ -23,6 +23,17 @@ export default function PatientSignup() {
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
   const [gender, setGender] = useState('');
+  const [selectedVitals, setSelectedVitals] = useState<string[]>([]);
+
+
+  const toggleVital = (vital: string) => {
+  setSelectedVitals((prev) =>
+    prev.includes(vital)
+      ? prev.filter((v) => v !== vital)
+      : [...prev, vital]
+  );
+};
+
 
   const sendOtp = () => {
     if (phone.length !== 10) {
@@ -52,7 +63,21 @@ export default function PatientSignup() {
       return;
     }
 
-    const patient = { role: 'patient', phone, name, age, gender };
+    if (selectedVitals.length === 0) {
+  Alert.alert("Select at least one vital");
+  return;
+}
+
+
+const patient = {
+  role: 'patient',
+  phone,
+  name,
+  age,
+  gender,
+  monitoredVitals: selectedVitals,
+};
+
     await addUser(patient);
     await setSession(patient);
     router.replace('/patient');
@@ -109,6 +134,38 @@ export default function PatientSignup() {
           {isVerified && (
             <>
               <View style={styles.divider} />
+
+              <Text style={styles.sectionTitle}>Vitals You Monitor</Text>
+
+<View style={styles.optionGrid}>
+  {[
+    "Blood Pressure",
+    "Heart Rate",
+    "Blood Sugar",
+    "Oxygen",
+  ].map((vital) => (
+    <Pressable
+      key={vital}
+      onPress={() => toggleVital(vital)}
+      style={[
+        styles.pill,
+        selectedVitals.includes(vital) &&
+          styles.pillActive,
+      ]}
+    >
+      <Text
+        style={[
+          styles.pillText,
+          selectedVitals.includes(vital) &&
+            styles.pillTextActive,
+        ]}
+      >
+        {vital}
+      </Text>
+    </Pressable>
+  ))}
+</View>
+
 
               <Text style={styles.sectionTitle}>Personal Details</Text>
 
