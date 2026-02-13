@@ -16,8 +16,6 @@ export type CheckInData = {
   feeling: string;
 };
 
-/* ---------------- VITAL RULE CONFIG ---------------- */
-
 type VitalRule = {
   medium: number;
   high: number;

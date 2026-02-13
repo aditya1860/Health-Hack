@@ -2,35 +2,39 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { useState } from "react";
 import CommonBackButton from "../../components/CommonBackButton";
 import * as Clipboard from "expo-clipboard";
-import { getSession } from "../../utils/storage";
-import { generateCode as generateBackendCode } from "../services/api";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { saveConnectionCode } from "../../utils/connection";
+import { getSession } from "../../utils/storage";
+
 
 export default function ConnectPatient() {
   const [code, setCode] = useState<string | null>(null);
 
-  const generateCode = async () => {
-    try {
-      const session = await getSession();
+const generateCode = async () => {
+  try {
+    const session = await getSession();
 
-      if (!session || session.role !== "doctor" || !session.phone) {
-        Alert.alert("Error", "Doctor session not found.");
-        return;
-      }
-
-      const response = await generateBackendCode(
-        session.phone,
-        session.name || "Doctor"
-      );
-
-      setCode(response.code);
-
-      Alert.alert("Code Generated", "Share this code with the patient.");
-    } catch (error) {
-      console.log(error);
-      Alert.alert("Error", "Failed to generate code.");
+    if (!session || session.role !== "doctor" || !session.phone) {
+      Alert.alert("Error", "Doctor session not found.");
+      return;
     }
-  };
+
+    // generate local random 6-character code
+const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // save locally so patient can use it
+    await saveConnectionCode(generatedCode, session.phone);
+
+    setCode(generatedCode);
+
+    Alert.alert("Code Generated", "Share this code with the patient.");
+
+  } catch (error) {
+    console.log(error);
+    Alert.alert("Error", "Failed to generate code.");
+  }
+};
+
 
   const copyCode = async () => {
     if (!code) return;

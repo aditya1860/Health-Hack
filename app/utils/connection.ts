@@ -12,6 +12,13 @@ export const saveConnectionCode = async (
   const data = await AsyncStorage.getItem(CODES_KEY);
   const codes = data ? JSON.parse(data) : {};
 
+  // remove previous codes of same doctor
+  Object.keys(codes).forEach((key) => {
+    if (codes[key].doctorPhone === doctorPhone) {
+      delete codes[key];
+    }
+  });
+
   codes[code] = {
     doctorPhone,
     createdAt: Date.now(),
@@ -20,6 +27,7 @@ export const saveConnectionCode = async (
   await AsyncStorage.setItem(CODES_KEY, JSON.stringify(codes));
 };
 
+
 // consume code when patient connects
 export const consumeConnectionCode = async (
   code: string,
@@ -27,6 +35,9 @@ export const consumeConnectionCode = async (
 ) => {
   const data = await AsyncStorage.getItem(CODES_KEY);
   const codes = data ? JSON.parse(data) : {};
+
+  console.log("All stored codes:", codes);
+console.log("Trying to find:", code);
 
   const entry = codes[code];
   if (!entry) return null;
